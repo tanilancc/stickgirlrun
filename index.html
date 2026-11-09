@@ -69,6 +69,7 @@
         </div>
       </div>
       <div class="hud-right">
+        <div class="dist" id="hud-dist" aria-label="Distance"></div>
         <div class="hearts" id="hud-hearts" aria-label="Hearts"></div>
         <div class="coins" aria-label="Coins"><span class="coin-ico"></span><span id="hud-coins">0</span></div>
         <button type="button" class="pause-btn" id="btn-pause" aria-label="Pause"><span></span><span></span></button>
@@ -112,9 +113,11 @@
         <p class="eyebrow">Stage six · Frozen Pass</p>
         <h2 class="game-title" id="end-title">Home.</h2>
         <p class="lede" id="end-text"></p>
+        <p class="end-note">The long way round is open now: an endless road through all six places.</p>
         <dl class="stats light" id="end-stats"></dl>
         <div class="btn-row">
-          <button type="button" class="cta" id="btn-end-map">Back to the map <span aria-hidden="true">→</span></button>
+          <button type="button" class="cta" id="btn-end-endless">Keep running <span aria-hidden="true">→</span></button>
+          <button type="button" class="btn-light" id="btn-end-map">Back to the map</button>
         </div>
       </div>
     </section>

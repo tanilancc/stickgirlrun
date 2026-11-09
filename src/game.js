@@ -1,22 +1,31 @@
-// World: one run through one stage. Owns speed, scoring, hearts, rescues and the finish.
-// Renderer-agnostic — it only emits events (jump, land, coin, hit, ...) for audio and effects.
+// World: one run through one stage (or the endless road). Owns speed, scoring, hearts,
+// rescues and the finish. Renderer-agnostic: it only emits events (jump, land, coin, hit,
+// leg, ...) for audio and effects.
 
 import { STAGES } from './stages.js';
 import { DIFFICULTY, GROUND_Y, PHYS } from './config.js';
 import { buildLevel, speedAt, highestGround, lowerBound } from './level.js';
 import { NOOP, createRunner, stepRunner, runnerBox } from './runner.js';
 import { Bot } from './bot.js';
+import { EndlessTrack, metres } from './endless.js';
 import { smooth } from './util.js';
 
 export class World {
-  constructor({ stageIndex = 0, diffId = 'adult', mode = 'girl', autopilot = false, invincible = false } = {}) {
-    this.stageIndex = stageIndex;
-    this.stage = STAGES[stageIndex];
+  constructor({ stageIndex = 0, diffId = 'adult', mode = 'girl', autopilot = false, invincible = false, endless = false } = {}) {
     this.diff = DIFFICULTY[diffId];
     this.mode = mode;
-    this.L = buildLevel(this.stage, this.diff);
-    this.coinTaken = new Uint8Array(this.L.coins.length);
-    this.pickTaken = new Uint8Array(this.L.pickups.length);
+    this.endless = endless;
+    if (endless) {
+      this.track = new EndlessTrack(this.diff);
+      this.L = this.track.L;
+      this.legI = 0;
+      this.leg = 0;
+      this.stageIndex = 0;
+    } else {
+      this.stageIndex = stageIndex;
+      this.L = buildLevel(STAGES[stageIndex], this.diff);
+    }
+    this.stage = STAGES[this.stageIndex];
     const kinds = mode === 'duo' ? ['girl', 'boy'] : [mode];
     const offs = mode === 'duo' ? [34, -34] : [0];
     this.runners = kinds.map((k, i) => createRunner(k, offs[i], GROUND_Y));
@@ -38,15 +47,23 @@ export class World {
     this.falls = 0;
     this.combo = 0;
     this.comboT = 0;
-    this.maxHearts = invincible ? Infinity : mode === 'duo' ? this.diff.duoHearts : this.diff.hearts;
+    // An endless run needs an end, so even kids get a (generous) number of hearts there.
+    const endlessHearts = this.diff.id === 'kids' ? (mode === 'duo' ? 7 : 5) : mode === 'duo' ? 5 : 3;
+    this.maxHearts = invincible ? Infinity : endless ? endlessHearts : mode === 'duo' ? this.diff.duoHearts : this.diff.hearts;
     this.hearts = this.maxHearts;
     this.listeners = [];
     this._ev = [];
     this._ctx = { L: this.L, diff: this.diff, d: 0, dPrev: 0, events: this._ev };
   }
 
+  /** Stage progress, or progress through the current landscape on the endless road. */
   get progress() {
+    if (this.endless) return this.track.legProgress(this.d + this.leadOffset);
     return Math.min(1, Math.max(0, (this.d + this.leadOffset) / this.L.length));
+  }
+
+  get metres() {
+    return metres(this.d + this.leadOffset);
   }
 
   on(fn) {
@@ -67,7 +84,8 @@ export class World {
       this.runTime += dt;
       const ramp = smooth(Math.min(1, this.time / 1.2));
       this.slow = Math.min(1, this.slow + dt * 0.6);
-      this.speed = speedAt(this.stage, this.diff, this.d, this.L.length) * (0.3 + 0.7 * ramp) * this.slow;
+      const base = this.endless ? this.track.speedAt(this.d) : speedAt(this.stage, this.diff, this.d, this.L.length);
+      this.speed = base * (0.3 + 0.7 * ramp) * this.slow;
     } else if (this.status === 'failed' || this.status === 'over') {
       this.speed = Math.max(0, this.speed - 900 * dt);
     } else {
@@ -76,6 +94,7 @@ export class World {
     this.accel = (this.speed - prevSpeed) / dt;
     this.dPrev = this.d;
     this.d += this.speed * dt;
+    if (this.endless) this._advanceTrack();
 
     const c = this._ctx;
     c.d = this.d;
@@ -91,7 +110,7 @@ export class World {
     this._collect();
 
     if (this.status === 'run') {
-      if (this.d + this.leadOffset >= this.L.finishX) {
+      if (!this.endless && this.d + this.leadOffset >= this.L.finishX) {
         this.status = 'finishing';
         this.statusT = 0;
         const stopX = this.L.finishX + 430;
@@ -107,6 +126,19 @@ export class World {
       this.status = 'over';
       this.statusT = 0;
       this.emit('over');
+    }
+  }
+
+  _advanceTrack() {
+    const tr = this.track;
+    tr.ensure(this.d);
+    const li = tr.legIndexAt(this.d + this.leadOffset);
+    const lg = tr.legs[li];
+    if (lg.leg !== this.leg) {
+      this.leg = lg.leg;
+      this.stageIndex = lg.stage;
+      this.stage = STAGES[lg.stage];
+      this.emit('leg', { leg: lg.leg, stage: this.stage });
     }
   }
 
@@ -183,9 +215,9 @@ export class World {
       for (let k = lowerBound(coins, b.x0 - R); k < coins.length; k++) {
         const cn = coins[k];
         if (cn.x > b.x1 + R) break;
-        if (this.coinTaken[k]) continue;
+        if (cn.got) continue;
         if (cn.y > b.y0 - R && cn.y < b.y1 + R) {
-          this.coinTaken[k] = 1;
+          cn.got = 1;
           this.coins++;
           this.combo = this.comboT > 0 ? this.combo + 1 : 0;
           this.comboT = 0.6;
@@ -195,9 +227,9 @@ export class World {
       const pk = this.L.pickups;
       for (let k = 0; k < pk.length; k++) {
         const p = pk[k];
-        if (this.pickTaken[k] || Math.abs(p.x - x) > 30) continue;
+        if (p.got || Math.abs(p.x - x) > 30) continue;
         if (p.y > b.y0 - 18 && p.y < b.y1 + 18) {
-          this.pickTaken[k] = 1;
+          p.got = 1;
           if (this.hearts < this.maxHearts) this.hearts++;
           this.emit('heart', { x: p.x, y: p.y, i });
         }
@@ -206,7 +238,7 @@ export class World {
   }
 
   stars() {
-    if (this.status !== 'done') return 0;
+    if (this.status !== 'done' || this.endless) return 0;
     const total = this.L.coins.length || 1;
     const frac = this.coins / total;
     const [a, b] = this.diff.starCoins;
@@ -225,6 +257,8 @@ export class World {
       time: this.runTime,
       stars: this.stars(),
       hearts: this.hearts,
+      metres: this.metres,
+      legs: this.endless ? this.leg + 1 : 1,
     };
   }
 }

@@ -57,3 +57,21 @@ Mila (stick girl) and Arlo (stick boy) have one day to get home. Each stage is a
 `tests/autopilot.test.js` runs the autopilot through every stage on both difficulties and requires
 it to finish with zero hits and zero falls, so the generator can never produce an impossible
 sequence. Unit tests cover determinism, jump physics, slide clearance and gap widths.
+
+## Addendum (2026-11-09): endless mode, "The Long Way Round"
+Requested after the six stages shipped. Decisions:
+- Unlocks when stage 6 is cleared on a difficulty. It is reached from a 7th postcard on the map
+  and from a "Keep running" button on the ending screen.
+- One road cycles through the six landscapes, 12,000 units per leg. Each crossing is a
+  breather, a hop over a gap with a signpost, and cross-faded sky, weather and audio. Ground,
+  props and hazards carry the landscape they were generated in (`th`), so two landscapes can
+  share the screen during a crossing.
+- Speed ramps per leg up to a cap (adult 440 → 690, kids 340 → 500). Tier rises with distance.
+  The patterns, physics and fairness rules are the same as the stages.
+- Finite hearts even for kids (5 / 3, more in duo), one heart pickup per landscape.
+- The score is distance in metres. The best is saved per difficulty and shown as a flag on the road.
+- Streaming: `EndlessTrack.ensure(d)` generates 2,800 units ahead and prunes 1,600 behind.
+  Collected coins and hearts carry their own flag, so pruning never misaligns state.
+- Tests: determinism, the leg cycle, flat memory over 20 legs, gap reach, and the autopilot
+  surviving 7.5 legs on both difficulties. A 15-leg run at the speed cap was also verified
+  hit-free in all four solo/duo × difficulty combinations.

@@ -5,7 +5,7 @@ const KEY = 'long-run-home.v1';
 const STAGES = 6;
 
 function defaults() {
-  const track = () => ({ unlocked: 1, stars: Array(STAGES).fill(0), coins: Array(STAGES).fill(0) });
+  const track = () => ({ unlocked: 1, stars: Array(STAGES).fill(0), coins: Array(STAGES).fill(0), endlessBest: 0, endlessCoins: 0 });
   return { settings: { runner: 'girl', diff: 'kids', muted: false }, progress: { kids: track(), adult: track() } };
 }
 
@@ -44,4 +44,17 @@ export function recordResult(state, diffId, stageIndex, stars, coins) {
   p.unlocked = Math.min(STAGES, Math.max(p.unlocked, stageIndex + 2));
   save(state);
   return p.unlocked > before;
+}
+
+/** The endless road opens once the sixth stage has been cleared on that difficulty. */
+export const endlessOpen = (state, diffId) => (state.progress[diffId].stars[STAGES - 1] || 0) > 0;
+
+/** Record an endless run; returns true for a new best distance. */
+export function recordEndless(state, diffId, metres, coins) {
+  const p = state.progress[diffId];
+  const best = metres > (p.endlessBest || 0);
+  if (best) p.endlessBest = metres;
+  p.endlessCoins = Math.max(p.endlessCoins || 0, coins);
+  save(state);
+  return best;
 }

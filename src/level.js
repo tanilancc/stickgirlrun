@@ -55,28 +55,39 @@ export function speedAt(stage, diff, x, length) {
 
 // ---------------------------------------------------------------- builder
 
-class Builder {
-  constructor(L, rng) {
+export class Builder {
+  /** theme: index of the stage whose look a new piece takes (endless mode mixes stages). */
+  constructor(L, rng, theme) {
     this.L = L;
     this.rng = rng;
     this.x = 0;
     this.y = GROUND_Y;
     this.segStart = -1800;
+    this.theme = theme;
+    this.segTheme = theme;
   }
   closeSeg(x1) {
-    if (x1 - this.segStart > 0.5) this.L.segments.push({ x0: this.segStart, x1, y: this.y });
+    if (x1 - this.segStart > 0.5) this.L.segments.push({ x0: this.segStart, x1, y: this.y, th: this.segTheme });
   }
   gap(w, dy = 0) {
     this.closeSeg(this.x);
     this.x += w;
     this.y += dy;
     this.segStart = this.x;
+    this.segTheme = this.theme;
   }
   step(dy) {
     if (!dy) return;
     this.closeSeg(this.x);
     this.y += dy;
     this.segStart = this.x;
+    this.segTheme = this.theme;
+  }
+  /** Close the open run of ground at the current x and continue it at the same height. */
+  split() {
+    this.closeSeg(this.x);
+    this.segStart = this.x;
+    this.segTheme = this.theme;
   }
   obstacle(o) {
     o.seed = (this.rng() * 1e9) | 0;
@@ -248,7 +259,7 @@ def('tall', { minTier: 0.9 }, (c) => {
   b.obstacle({ kind: 'solid', skin, x, y: b.y - h, w, h });
   b.coinArc(x - speed * JUMP.air * 0.42, b.y, speed, 4, h, 0.08, 0.55);
   for (let xi = x + 22; xi < x + w - 14; xi += 34) b.coin(xi, b.y - h - 34);
-  if (!c.kids && c.tier > 1.2 && c.L.pickups.length < 2 && rng() < 0.4) {
+  if (c.heartOk() && rng() < 0.4) {
     c.L.pickups.push({ type: 'heart', x: Math.round(x + w / 2), y: Math.round(b.y - h - 150) });
   }
   b.x = x + w + 30;
@@ -328,19 +339,50 @@ function choosePattern(c, recent) {
 
 // ---------------------------------------------------------------- decor
 
-function placeDecor(L, stage, rng) {
-  const kinds = stage.decor || [];
-  if (!kinds.length) return;
-  for (const s of L.segments) {
+/** Sprinkle ground decor over segments (from index `from`), skipping obstacle footprints. */
+export function decorate(L, kindsFor, rng, from = 0, xMax = Infinity) {
+  const obs = L.obstacles;
+  for (let i = from; i < L.segments.length; i++) {
+    const s = L.segments[i];
+    const kinds = kindsFor(s);
+    if (!kinds || !kinds.length) continue;
     let x = Math.max(s.x0 + 30, -600);
-    while (x < Math.min(s.x1 - 30, L.length + 1200)) {
+    while (x < Math.min(s.x1 - 30, xMax)) {
       x += lerp(70, 260, rng());
       if (x > s.x1 - 30) break;
-      const near = L.obstacles.some((o) => o.ground === s.y && x > o.x - 40 && x < o.x + o.w + 40);
+      let near = false;
+      for (let k = obstacleStart(L, x - 40); k < obs.length; k++) {
+        const o = obs[k];
+        if (o.x > x + 40) break;
+        if (o.ground === s.y && x > o.x - 40 && x < o.x + o.w + 40) {
+          near = true;
+          break;
+        }
+      }
       if (near) continue;
-      L.decor.push({ skin: pick(rng, kinds), x: Math.round(x), y: s.y, s: lerp(0.75, 1.25, rng()), seed: (rng() * 1e9) | 0 });
+      L.decor.push({ skin: pick(rng, kinds), x: Math.round(x), y: s.y, s: lerp(0.75, 1.25, rng()), seed: (rng() * 1e9) | 0, th: s.th });
     }
   }
+}
+
+/**
+ * Place one hazard pattern (plus the breathing room after it) at the builder's position.
+ * Shared by the fixed stages and the endless track so both play by the same rules.
+ */
+export function placePattern(b, rng, stage, diff, speed, tier, recent, heartOk) {
+  const L = b.L;
+  const nObs = L.obstacles.length;
+  const nMov = L.movers.length;
+  const c = { b, rng, speed, tier, diff, stage, L, kids: diff.id === 'kids', heartOk };
+  const p = choosePattern(c, recent);
+  p.make(c);
+  recent.push(p.id);
+  if (recent.length > 4) recent.shift();
+  for (let i = nObs; i < L.obstacles.length; i++) L.obstacles[i].th = b.theme;
+  for (let i = nMov; i < L.movers.length; i++) L.movers[i].th = b.theme;
+  const restT = lerp(0.88, 0.44, tier / 3) / diff.density;
+  b.x += speed * restT * (0.85 + rng() * 0.35);
+  return p.id;
 }
 
 // ---------------------------------------------------------------- build
@@ -365,16 +407,10 @@ export function buildLevel(stage, diff) {
   b.x = 1150;
   const recent = [];
   while (b.x < length - 1300) {
-    const prog = b.x / length;
     const speed = speedAt(stage, diff, b.x, length);
-    const tier = clamp((stage.tier + prog * 1.5) * diff.tierMul, 0, 3);
-    const c = { b, rng, speed, tier, diff, stage, prog, L, kids: diff.id === 'kids' };
-    const p = choosePattern(c, recent);
-    p.make(c);
-    recent.push(p.id);
-    if (recent.length > 4) recent.shift();
-    const restT = lerp(0.88, 0.44, tier / 3) / diff.density;
-    b.x += speed * restT * (0.85 + rng() * 0.35);
+    const tier = clamp((stage.tier + (b.x / length) * 1.5) * diff.tierMul, 0, 3);
+    const heartOk = () => diff.id !== 'kids' && tier > 1.2 && L.pickups.length < 2;
+    placePattern(b, rng, stage, diff, speed, tier, recent, heartOk);
   }
   // A long pattern can run past the nominal length: the finish line always sits on the
   // final, hazard-free stretch of ground.
@@ -384,7 +420,7 @@ export function buildLevel(stage, diff) {
   L.obstacles.sort((p, q) => p.x - q.x);
   L.coins.sort((p, q) => p.x - q.x);
   L.movers.sort((p, q) => p.cx - q.cx);
-  placeDecor(L, stage, rng);
+  decorate(L, () => stage.decor, rng, 0, L.length + 1200);
   L.decor.sort((p, q) => p.x - q.x);
   return L;
 }

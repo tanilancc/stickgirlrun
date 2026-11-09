@@ -263,6 +263,11 @@ kbd {
 .card .time { font-family: var(--cond); font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; font-size: 12px; color: #6a5a48; }
 .card .stars { display: flex; gap: 2px; }
 .card .stars svg { width: 16px; height: 16px; }
+.card .best { font-family: var(--cond); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 12px; color: #8a5a14; }
+.route li.endless { grid-column: span 2; }
+.route li.endless .card canvas, .route li.endless .card .lock { aspect-ratio: 32 / 10; object-fit: cover; }
+.route li.endless .no { font-style: normal; font-size: 17px; line-height: 1; }
+@media (max-width: 560px) { .route li.endless { grid-column: auto; } .route li.endless .card canvas, .route li.endless .card .lock { aspect-ratio: 16 / 10; } }
 .card:disabled { cursor: not-allowed; }
 .card:disabled canvas { filter: grayscale(0.9) brightness(0.55); }
 .card .lock {
@@ -326,6 +331,14 @@ kbd {
 .coins { font-weight: 600; font-size: 26px; display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
 .coins.bump { animation: bump 0.25s ease; }
 @keyframes bump { 50% { transform: scale(1.12); } }
+.dist {
+  display: none;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
 .coin-ico {
   width: 17px;
   height: 17px;
@@ -489,6 +502,24 @@ kbd {
   background: linear-gradient(90deg, rgba(20, 12, 8, 0.82) 0%, rgba(20, 12, 8, 0.5) 40%, rgba(20, 12, 8, 0) 70%);
 }
 #screen-ending .stats { margin-top: 4px; }
+#screen-ending .btn-row { align-items: center; gap: 14px; }
+.end-note { font-family: var(--hand); font-size: 23px; color: var(--gold); margin: -10px 0 18px; }
+.btn-light {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(20, 16, 12, 0.35);
+  color: var(--paper);
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 13px 18px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.btn-light:hover { border-color: rgba(243, 235, 221, 0.7); }
 
 #fade { position: fixed; inset: 0; background: #0d0b09; opacity: 0; pointer-events: none; transition: opacity 0.45s ease; }
 #fade.on { opacity: 1; }

@@ -6,7 +6,8 @@ import { World } from './game.js';
 import { Renderer } from './renderer.js';
 import { Input } from './input.js';
 import { AudioEngine } from './audio.js';
-import { load, save, recordResult } from './storage.js';
+import { load, save, recordResult, recordEndless, endlessOpen } from './storage.js';
+import { UNITS_PER_METRE } from './endless.js';
 import { buildBackground, drawBackground } from './backgrounds.js';
 import { createAnim, updateAnim, drawFigure } from './figure.js';
 import { createRunner } from './runner.js';
@@ -21,8 +22,12 @@ const store = load();
 audio.muted = store.settings.muted;
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 
+/** Pseudo stage index for the endless road on the map. */
+const ENDLESS = STAGES.length;
+
 const app = {
   screen: 'title',
+  current: 0,
   world: null,
   attract: true,
   attractIdx: 0,
@@ -42,6 +47,7 @@ const HEART = (on) =>
   `<svg viewBox="0 0 24 22" class="${on ? '' : 'lost'}"><path d="M12 20.5C5 15.6 1.6 12 1.6 7.6 1.6 4.4 4 2 7 2c2 0 3.7 1.1 5 2.9C13.3 3.1 15 2 17 2c3 0 5.4 2.4 5.4 5.6 0 4.4-3.4 8-10.4 12.9z" fill="${on ? '#e5484d' : 'none'}" stroke="${on ? '#8a1e22' : '#f3ebdd'}" stroke-width="1.4"/></svg>`;
 
 const runnerLabel = (m) => (m === 'duo' ? 'Mila & Arlo' : CHARACTERS[m].name);
+const fmtNum = (n) => Math.round(n).toLocaleString('en-US');
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 function fadeThrough(fn) {
@@ -139,6 +145,7 @@ function drawIcons(dt) {
 const thumbs = new Map();
 function makeThumb(i) {
   if (thumbs.has(i)) return thumbs.get(i);
+  if (i === ENDLESS) return makeEndlessThumb();
   const st = STAGES[i];
   const c = document.createElement('canvas');
   c.width = 480;
@@ -172,6 +179,40 @@ function makeThumb(i) {
   return c;
 }
 
+function makeEndlessThumb() {
+  const c = document.createElement('canvas');
+  c.width = 480;
+  c.height = 300;
+  const g = c.getContext('2d');
+  const n = STAGES.length;
+  const slant = 46;
+  for (let k = 0; k < n; k++) {
+    const x0 = (k * 480) / n;
+    const x1 = ((k + 1) * 480) / n;
+    g.save();
+    g.beginPath();
+    g.moveTo(x0 + slant / 2 - (k === 0 ? 60 : 0), 0);
+    g.lineTo(x1 + slant / 2 + (k === n - 1 ? 60 : 0), 0);
+    g.lineTo(x1 - slant / 2 + (k === n - 1 ? 60 : 0), 300);
+    g.lineTo(x0 - slant / 2 - (k === 0 ? 60 : 0), 300);
+    g.closePath();
+    g.clip();
+    g.drawImage(makeThumb(k), 0, 0);
+    g.restore();
+  }
+  g.strokeStyle = 'rgba(239,229,211,0.85)';
+  g.lineWidth = 2;
+  for (let k = 1; k < n; k++) {
+    const x = (k * 480) / n;
+    g.beginPath();
+    g.moveTo(x + slant / 2, 0);
+    g.lineTo(x - slant / 2, 300);
+    g.stroke();
+  }
+  thumbs.set(ENDLESS, c);
+  return c;
+}
+
 function openMap() {
   const diff = store.settings.diff;
   const prog = store.progress[diff];
@@ -199,6 +240,27 @@ function openMap() {
     route.appendChild(li);
     canvases.push(b.querySelector('canvas'));
   });
+  {
+    const open = endlessOpen(store, diff);
+    const best = prog.endlessBest || 0;
+    const li = document.createElement('li');
+    li.className = 'endless';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'card';
+    b.disabled = !open;
+    b.style.setProperty('--tilt', '-0.9deg');
+    b.innerHTML = `<canvas width="480" height="300"></canvas><span class="no">∞</span>${open ? '' : '<span class="lock">Finish stage 6 to open</span>'}<span class="name">The Long Way Round</span><span class="meta"><span class="time">Endless · all six, again and again</span><span class="best">${best ? `best ${fmtNum(best)} m` : open ? 'no run yet' : ''}</span></span>`;
+    b.setAttribute('aria-label', `Endless mode, the long way round${open ? (best ? `, best ${best} metres` : '') : ', locked until stage 6 is finished'}`);
+    b.addEventListener('click', () => {
+      audio.unlock();
+      audio.click();
+      startStage(ENDLESS);
+    });
+    li.appendChild(b);
+    route.appendChild(li);
+    canvases.push(b.querySelector('canvas'));
+  }
   showScreen('map');
   // paint the postcards one at a time so the menu stays responsive
   let k = 0;
@@ -234,25 +296,37 @@ function startStage(i) {
     app.attract = false;
     app.paused = false;
     app.acc = 0;
-    app.hud = { coins: -1, hearts: -2 };
+    app.current = i;
+    app.hud = { coins: -1, hearts: -2, metres: -1 };
     const mode = store.settings.runner;
-    const w = new World({ stageIndex: i, diffId: store.settings.diff, mode });
+    const endless = i === ENDLESS;
+    const w = new World({ stageIndex: endless ? 0 : i, diffId: store.settings.diff, mode, endless });
     w.on(onWorldEvent);
     app.world = w;
     renderer.setWorld(w);
+    const best = store.progress[store.settings.diff].endlessBest || 0;
+    renderer.bestX = endless && best > 0 ? best * UNITS_PER_METRE : null;
+    renderer.bestLabel = best > 0 ? `${fmtNum(best)} m` : '';
     input.setMode(mode === 'duo');
     input.enabled = true;
     showScreen('play');
     hudInit(w);
-    showCaption(w.stage, i);
+    if (endless) showCaption(null, 0, 'Endless · the long way round', 'No finish line this time. Six places, round and round. How far can you get?');
+    else showCaption(w.stage, i);
     showTouchHints(mode);
     audio.unlock();
     audio.startStage(w.stage);
   });
 }
 
+function hudStageLabel(w) {
+  return w.endless ? `Leg ${w.leg + 1} · ${w.stage.name}` : `${w.stageIndex + 1} · ${w.stage.name}`;
+}
+
 function hudInit(w) {
-  $('hud-stage').textContent = `${w.stageIndex + 1} · ${w.stage.name}`;
+  $('hud-stage').textContent = hudStageLabel(w);
+  $('hud-dist').style.display = w.endless ? 'block' : 'none';
+  $('hud').classList.toggle('endless', w.endless);
   const kinds = w.runners.map((r) => r.kind);
   $('dot-0').style.background = CHARACTERS[kinds[0]].accent;
   $('dot-1').style.display = kinds.length > 1 ? 'block' : 'none';
@@ -260,13 +334,17 @@ function hudInit(w) {
 }
 
 function hudUpdate(w) {
-  const L = w.L.length;
   const p = w.progress;
   $('track-fill').style.width = `${(p * 100).toFixed(2)}%`;
   w.runners.forEach((r, i) => {
-    const q = Math.max(0, Math.min(1, (w.d + r.offset) / L));
+    // endless: the track shows the way through the current landscape
+    const q = w.endless ? p : Math.max(0, Math.min(1, (w.d + r.offset) / w.L.length));
     $(`dot-${i}`).style.left = `${(q * 100).toFixed(2)}%`;
   });
+  if (w.endless && w.metres !== app.hud.metres) {
+    app.hud.metres = w.metres;
+    $('hud-dist').textContent = `${fmtNum(w.metres)} m`;
+  }
   if (w.coins !== app.hud.coins) {
     const el = $('hud-coins');
     el.textContent = w.coins;
@@ -290,9 +368,9 @@ function hudUpdate(w) {
   }
 }
 
-function showCaption(stage, i) {
+function showCaption(stage, i, label, text) {
   const c = $('caption');
-  c.innerHTML = `<span class="stage-no">Stage ${i + 1} · ${stage.time}</span>${stage.caption}`;
+  c.innerHTML = `<span class="stage-no">${label || `Stage ${i + 1} · ${stage.time}`}</span>${text || stage.caption}`;
   c.classList.add('on');
   clearTimeout(app.captionTimer);
   app.captionTimer = setTimeout(() => c.classList.remove('on'), 4200);
@@ -353,7 +431,13 @@ function onWorldEvent(type, data) {
       input.enabled = false;
       break;
     case 'over':
-      showFail();
+      if (w.endless) showEndlessResults();
+      else showFail();
+      break;
+    case 'leg':
+      $('hud-stage').textContent = hudStageLabel(w);
+      showCaption(null, 0, `Leg ${data.leg + 1} · ${data.stage.time}`, data.stage.name);
+      audio.startStage(data.stage);
       break;
     default:
   }
@@ -367,7 +451,7 @@ function setPause(on) {
   $('screen-pause').classList.toggle('active', on);
   input.releaseAll();
   if (on) {
-    $('pause-sub').textContent = `${w.stage.name} · ${Math.round(w.progress * 100)}% of the way`;
+    $('pause-sub').textContent = w.endless ? `${fmtNum(w.metres)} m along the long way round` : `${w.stage.name} · ${Math.round(w.progress * 100)}% of the way`;
     $('pause-controls').innerHTML = keysHint();
     syncSoundLabels();
     if (!isTouch) $('btn-resume').focus({ preventScroll: true });
@@ -432,6 +516,34 @@ function showFail() {
   if (!isTouch) btns.querySelector('button').focus({ preventScroll: true });
 }
 
+function showEndlessResults() {
+  const w = app.world;
+  const s = w.summary();
+  const diff = store.settings.diff;
+  const before = store.progress[diff].endlessBest || 0;
+  const isBest = recordEndless(store, diff, s.metres, s.coins);
+  $('res-stars').innerHTML = '';
+  $('res-title').textContent = isBest ? 'New best.' : 'The road goes on.';
+  $('res-sub').textContent = `${fmtNum(s.metres)} m, as far as ${w.stage.name}.`;
+  $('res-stats').innerHTML = `<div><dt>Distance</dt><dd>${fmtNum(s.metres)}<small style="font-size:.55em;opacity:.6"> m</small></dd></div><div><dt>Coins</dt><dd>${s.coins}</dd></div><div><dt>Best</dt><dd>${fmtNum(Math.max(before, s.metres))}<small style="font-size:.55em;opacity:.6"> m</small></dd></div>`;
+  $('res-note').textContent = isBest
+    ? before
+      ? `${fmtNum(s.metres - before)} m further than ever. A flag on the road marks it now.`
+      : 'A flag on the road will mark this spot next time.'
+    : `${fmtNum(before - s.metres)} m short of your best. Heart pickups sit on the tall obstacles, one per landscape.`;
+  const btns = $('res-buttons');
+  btns.innerHTML = '<button type="button" class="btn primary" data-act="again">Run again</button><button type="button" class="btn" data-act="map">Stage map</button>';
+  btns.onclick = (e) => {
+    const act = e.target.closest('button')?.dataset.act;
+    if (!act) return;
+    audio.click();
+    if (act === 'again') startStage(ENDLESS);
+    else backToMap();
+  };
+  $('screen-results').classList.add('active');
+  if (!isTouch) btns.querySelector('button').focus({ preventScroll: true });
+}
+
 function showEnding(s) {
   const diff = store.settings.diff;
   const total = store.progress[diff].stars.reduce((a, b) => a + b, 0);
@@ -446,7 +558,7 @@ function showEnding(s) {
 function backToMap() {
   fadeThrough(() => {
     input.enabled = false;
-    startAttract(app.world ? app.world.stageIndex : 0);
+    startAttract(app.world && !app.world.endless ? app.world.stageIndex : 0);
     openMap();
   });
 }
@@ -469,9 +581,8 @@ $('btn-map-back').addEventListener('click', () => {
 $('btn-pause').addEventListener('click', () => setPause(true));
 $('btn-resume').addEventListener('click', () => setPause(false));
 $('btn-restart').addEventListener('click', () => {
-  const i = app.world.stageIndex;
   $('screen-pause').classList.remove('active');
-  startStage(i);
+  startStage(app.current);
 });
 $('btn-pause-map').addEventListener('click', () => {
   $('screen-pause').classList.remove('active');
@@ -484,6 +595,10 @@ $('btn-sound-title').addEventListener('click', () => {
   toggleMute();
 });
 $('btn-end-map').addEventListener('click', backToMap);
+$('btn-end-endless').addEventListener('click', () => {
+  audio.click();
+  startStage(ENDLESS);
+});
 
 input.on('pause', () => {
   if (app.screen === 'play') setPause(!app.paused);

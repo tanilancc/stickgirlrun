@@ -2,7 +2,7 @@
 
 A hand-crafted stick-figure running game for the browser. **Mila** (stick girl) and **Arlo**
 (stick boy) have one day to get home across six stages, from a sunrise meadow to a frozen
-mountain pass at dawn. It plays on desktop (keyboard or gamepad) and on phones (touch). One or
+mountain pass at dawn. Then the long way round opens: an endless road through all six. It plays on desktop (keyboard or gamepad) and on phones (touch). One or
 two players can play, in a gentle **Kids** mode or a faster **Teen / Adult** mode.
 
 ![Title screen](docs/screenshots/title.jpg)
@@ -39,6 +39,24 @@ To publish it, turn on **GitHub Pages** for the repository (Settings â†’ Pages â
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
+
+## Endless: The Long Way Round
+
+Clearing stage 6 opens a seventh postcard on the map, and a **Keep running** button on the
+ending screen. It is one unbroken road through all six landscapes, in order, over and over:
+
+![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
+
+- Every 12,000 units (about 20 seconds) the road hops a gap into the next landscape, past a
+  hand-lettered signpost. The sky, weather, music and ambience cross-fade as you go.
+- Speed keeps climbing landscape after landscape, then holds at a cap a person can still react
+  to: 690 for Teen / Adult and 500 for Kids.
+- An endless run needs an end, so hearts are limited (Kids 5, Teen / Adult 3, more in duo).
+  One heart pickup appears per landscape, on top of a tall obstacle.
+- Your score is the distance in metres. Your best is saved per difficulty and planted as a
+  **BEST** flag on the road, so you can see yourself beat it.
+- The road is generated a few seconds ahead of the runners and forgotten behind them, so memory
+  stays flat (about 100 live objects) however far you run.
 
 ## Who it is for
 
@@ -88,7 +106,9 @@ of the screen is Mila and the right half is Arlo (top = jump, bottom = slide). T
 Every hazard is placed from the runner's real jump arc at the speed it will be met. The coin
 trails follow the exact path of a full jump, so they double as a hint for when to jump.
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
-requires it to finish with **zero hits and zero falls**. The autopilot does not know the level:
+requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
+more than one full lap of the endless road, and checks that it is deterministic, cycles through
+all six landscapes, keeps every gap jumpable and keeps memory flat. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
 
@@ -105,6 +125,7 @@ src/stages.js               the six stages: palettes, hazards, weather, music
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
+src/endless.js              endless road: streams + prunes the level, landscape legs
 src/game.js                 World: speed, scoring, hearts, rescue, finish
 src/figure.js               skeleton, IK, poses, hair/scarf, drawing
 src/backgrounds.js          procedural parallax layers, sky, sun, aurora

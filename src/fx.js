@@ -270,6 +270,7 @@ export class Weather {
   draw(ctx, view, t, camY) {
     const k = this.kind;
     const P = this.P;
+    const ga = ctx.globalAlpha; // callers fade whole weather systems in and out
     if (this.birds.length) {
       ctx.strokeStyle = alpha(mix(P.ink, P.haze, 0.45), 0.85);
       ctx.lineWidth = 1.4;
@@ -348,12 +349,12 @@ export class Weather {
     } else if (k === 'snow') {
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       for (const o of this.items) {
-        ctx.globalAlpha = 0.35 + o.z * 0.6;
+        ctx.globalAlpha = ga * (0.35 + o.z * 0.6);
         ctx.beginPath();
         ctx.arc(o.x, o.y, 0.8 + o.z * 2.2, 0, TAU);
         ctx.fill();
       }
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = ga;
     }
   }
 }

@@ -63,39 +63,35 @@ function poly(ctx, x, y, pts) {
 
 // ---------------------------------------------------------------- ground
 
-export function drawTerrain(ctx, L, stage, P, T, view, cam, t) {
+/**
+ * look(th) -> { st, P, T }: the stage, palette and tone a piece of the world belongs to.
+ * Fixed stages pass one look for everything; the endless road mixes landscapes.
+ */
+export function drawTerrain(ctx, L, look, view, cam, t) {
   const x0 = cam.x - 60;
   const x1 = cam.x + view.w + 60;
   const bottom = cam.y + view.bottom + 20;
   const segs = L.segments;
   const first = Math.max(0, segIndexAt(L, x0) - 1);
-  const terr = stage.terrain;
 
-  // pits (gaps between segments)
+  // pits (gaps between segments) take the look of the ground they open out of
   for (let i = first; i < segs.length - 1; i++) {
     const a = segs[i];
     const b = segs[i + 1];
     if (a.x1 > x1) break;
     if (b.x0 - a.x1 < 1) continue;
-    drawPit(ctx, terr, P, T, a, b, bottom, t);
+    const k = look(a.th);
+    drawPit(ctx, k.st.terrain, k.P, k.T, a, b, bottom, t);
   }
-  if (terr === 'harbor') {
-    const wy = GROUND_Y + 62;
-    ctx.fillStyle = vg(ctx, wy, wy + 160, mix(P.water, '#3a4c5c', 0.35), P.water);
-    ctx.fillRect(x0, wy, x1 - x0, bottom - wy);
-    ctx.strokeStyle = alpha('#9db4c8', 0.18);
-    ctx.lineWidth = 1;
-    for (let k = 0; k < 26; k++) {
-      const yy = wy + 4 + k * 7;
-      const ph = t * (1.5 + (k % 3)) + k;
-      ctx.beginPath();
-      for (let xx = Math.floor(x0 / 40) * 40; xx < x1; xx += 40) {
-        const o = Math.sin(xx * 0.05 + ph) * 2;
-        ctx.moveTo(xx + hash(k * 31 + xx) * 20, yy + o);
-        ctx.lineTo(xx + 12 + hash(k * 31 + xx) * 20, yy + o);
-      }
-      ctx.stroke();
-    }
+  // open water beneath the harbour piers (and the gaps between them)
+  for (let i = first; i < segs.length; i++) {
+    const s = segs[i];
+    if (s.x0 > x1) break;
+    const k = look(s.th);
+    if (k.st.terrain !== 'harbor') continue;
+    const next = segs[i + 1];
+    const end = next && look(next.th).st.terrain === 'harbor' ? next.x0 : s.x1;
+    drawWater(ctx, k.P, Math.max(s.x0, x0), Math.min(end, x1), bottom, t);
   }
   for (let i = first; i < segs.length; i++) {
     const s = segs[i];
@@ -107,8 +103,34 @@ export function drawTerrain(ctx, L, stage, P, T, view, cam, t) {
     const openR = !next || next.x0 > s.x1 + 0.5 || next.y > s.y;
     const sx0 = Math.max(s.x0, x0);
     const sx1 = Math.min(s.x1, x1);
-    SEG[terr](ctx, s, sx0, sx1, bottom, P, T, t, openL, openR);
+    const k = look(s.th);
+    SEG[k.st.terrain](ctx, s, sx0, sx1, bottom, k.P, k.T, t, openL, openR);
   }
+}
+
+function drawWater(ctx, P, x0, x1, bottom, t) {
+  if (x1 <= x0) return;
+  const wy = GROUND_Y + 62;
+  ctx.fillStyle = vg(ctx, wy, wy + 160, mix(P.water, '#3a4c5c', 0.35), P.water);
+  ctx.fillRect(x0, wy, x1 - x0, bottom - wy);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x0, wy, x1 - x0, bottom - wy);
+  ctx.clip();
+  ctx.strokeStyle = alpha('#9db4c8', 0.18);
+  ctx.lineWidth = 1;
+  for (let k = 0; k < 26; k++) {
+    const yy = wy + 4 + k * 7;
+    const ph = t * (1.5 + (k % 3)) + k;
+    ctx.beginPath();
+    for (let xx = Math.floor(x0 / 40) * 40; xx < x1; xx += 40) {
+      const o = Math.sin(xx * 0.05 + ph) * 2;
+      ctx.moveTo(xx + hash(k * 31 + xx) * 20, yy + o);
+      ctx.lineTo(xx + 12 + hash(k * 31 + xx) * 20, yy + o);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function drawPit(ctx, terr, P, T, a, b, bottom, t) {
@@ -965,7 +987,7 @@ const OB = {
   },
 };
 
-export function drawObstacles(ctx, L, stage, P, T, view, cam, t) {
+export function drawObstacles(ctx, L, look, view, cam, t) {
   const x0 = cam.x - 120;
   const x1 = cam.x + view.w + 140;
   const obs = L.obstacles;
@@ -974,20 +996,23 @@ export function drawObstacles(ctx, L, stage, P, T, view, cam, t) {
     if (o.x > x1) break;
     if (o.x + o.w < x0) continue;
     const f = OB[o.skin];
-    if (f) f(ctx, o, T, P, t, stage);
+    if (!f) continue;
+    const k = look(o.th);
+    f(ctx, o, k.T, k.P, t, k.st);
   }
 }
 
 // ---------------------------------------------------------------- movers
 
 const tmp = {};
-export function drawMovers(ctx, L, stage, P, T, view, cam, d, t) {
+export function drawMovers(ctx, L, look, view, cam, d, t) {
   const x0 = cam.x - 200;
   const x1 = cam.x + view.w + 200;
   for (const m of L.movers) {
     if (m.cx < x0 - 1600 || m.cx > x1 + 1600) continue;
     const s = moverState(m, d, tmp);
     if (s.x < x0 || s.x > x1) continue;
+    const { T, P } = look(m.th);
     if (m.type === 'roller') drawRoller(ctx, m, s, T, P);
     else if (m.type === 'swing') drawSwing(ctx, m, s, T, P);
     else drawIcicle(ctx, m, s, T, t);
@@ -1379,7 +1404,7 @@ const DECOR = {
   },
 };
 
-export function drawDecor(ctx, L, P, T, view, cam) {
+export function drawDecor(ctx, L, look, view, cam) {
   const x0 = cam.x - 80;
   const x1 = cam.x + view.w + 80;
   const dec = L.decor;
@@ -1387,20 +1412,83 @@ export function drawDecor(ctx, L, P, T, view, cam) {
     const d = dec[i];
     if (d.x > x1) break;
     const f = DECOR[d.skin];
-    if (f) f(ctx, d, T, P);
+    if (!f) continue;
+    const k = look(d.th);
+    f(ctx, d, k.T, k.P);
+  }
+}
+
+/** Endless road: a hand-lettered signpost at the start of each landscape. */
+export function drawSigns(ctx, L, look, view, cam) {
+  for (const g of L.signs || []) {
+    if (g.x < cam.x - 200 || g.x > cam.x + view.w + 60) continue;
+    const { st, T } = look(g.stage);
+    const x = g.x;
+    const y = g.y;
+    ctx.fillStyle = T('#4a3424');
+    ctx.fillRect(x - 2.5, y - 78, 5, 78);
+    ctx.font = '700 17px Caveat, "Segoe Print", cursive';
+    const name = st.name;
+    const pw = ctx.measureText(name).width + 26;
+    ctx.fillStyle = vg(ctx, y - 84, y - 62, T('#b08a5a'), T('#7a5634'));
+    ctx.beginPath();
+    ctx.moveTo(x - 12, y - 84);
+    ctx.lineTo(x - 12 + pw, y - 84);
+    ctx.lineTo(x + pw, y - 73);
+    ctx.lineTo(x - 12 + pw, y - 62);
+    ctx.lineTo(x - 12, y - 62);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = alpha('#000000', 0.25);
+    ctx.fillRect(x - 12, y - 63, pw, 1.5);
+    ctx.fillStyle = '#2a1a0e';
+    ctx.fillText(name, x - 2, y - 67);
+    ctx.font = '600 10px "Barlow Condensed", "Arial Narrow", sans-serif';
+    const sub = `LEG ${g.leg + 1}`;
+    const sw = ctx.measureText(sub).width + 12;
+    ctx.fillStyle = T('#8a6a44');
+    ctx.fillRect(x - sw / 2, y - 56, sw, 13);
+    ctx.fillStyle = '#f3ebdd';
+    ctx.fillText(sub, x - sw / 2 + 6, y - 46);
+  }
+}
+
+/** Endless road: where your best run ended, so you can see yourself beat it. */
+export function drawBestFlag(ctx, x, y, t, label) {
+  ctx.strokeStyle = 'rgba(243,235,221,0.85)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y - 128);
+  ctx.stroke();
+  const wv = Math.sin(t * 5) * 3;
+  ctx.fillStyle = '#e9b44c';
+  ctx.beginPath();
+  ctx.moveTo(x + 1, y - 128);
+  ctx.quadraticCurveTo(x + 22, y - 124 + wv, x + 44, y - 118 + wv * 1.4);
+  ctx.quadraticCurveTo(x + 22, y - 110 + wv, x + 1, y - 106);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#15120f';
+  ctx.font = '700 10px "Barlow Condensed", "Arial Narrow", sans-serif';
+  ctx.fillText('BEST', x + 6, y - 114 + wv * 0.5);
+  if (label) {
+    ctx.fillStyle = 'rgba(243,235,221,0.9)';
+    ctx.font = '600 12px "Barlow Condensed", "Arial Narrow", sans-serif';
+    ctx.fillText(label, x + 6, y - 92);
   }
 }
 
 // ---------------------------------------------------------------- collectibles
 
-export function drawCoins(ctx, L, taken, view, cam, t, glow) {
+export function drawCoins(ctx, L, view, cam, t, glow) {
   const x0 = cam.x - 20;
   const x1 = cam.x + view.w + 20;
   const coins = L.coins;
   for (let i = lowerBound(coins, x0); i < coins.length; i++) {
     const c = coins[i];
     if (c.x > x1) break;
-    if (taken[i]) continue;
+    if (c.got) continue;
     const s = Math.cos(t * 3.2 + c.x * 0.013);
     const w = Math.max(1.4, Math.abs(s) * 8.5);
     const y = c.y + Math.sin(t * 2.4 + c.x * 0.02) * 1.6;
@@ -1443,10 +1531,10 @@ export function heartPath(ctx, x, y, s) {
   ctx.closePath();
 }
 
-export function drawPickups(ctx, L, taken, t) {
+export function drawPickups(ctx, L, t) {
   for (let i = 0; i < L.pickups.length; i++) {
-    if (taken[i]) continue;
     const p = L.pickups[i];
+    if (p.got) continue;
     const s = 11 + Math.sin(t * 5) * 1.2;
     const y = p.y + Math.sin(t * 2) * 3;
     const g = ctx.createRadialGradient(p.x, y, 0, p.x, y, 34);

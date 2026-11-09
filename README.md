@@ -15,15 +15,22 @@ two players can play, in a gentle **Kids** mode or a faster **Teen / Adult** mod
 
 ## Play it
 
-The game has no build step and no dependencies. ES modules need to be served over HTTP:
+**Online:** <https://tanilancc.github.io/stickgirlrun/> (deployed by GitHub Pages from `main`).
+
+**Locally:** there is no build step and no dependencies. ES modules need to be served over HTTP:
 
 ```bash
 npm start
 ```
 
 Then open <http://localhost:8080>. Any static server works too (`python3 -m http.server`).
-To publish it, turn on **GitHub Pages** for the repository (Settings → Pages → deploy from the
-`main` branch, root folder). The game is fully static.
+
+### Deployment
+
+`.github/workflows/pages.yml` runs `npm test` on every push and pull request. When the tests
+pass on `main`, it publishes only the playable files (`index.html`, `css/`, `src/`) to GitHub
+Pages. All paths are relative, so the game works from the `/stickgirlrun/` sub-path. It needs a
+one-time setting: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
 ## The six stages
 

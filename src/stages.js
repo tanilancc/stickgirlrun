@@ -1,6 +1,9 @@
-// The six stages of the journey home. Everything visual about a stage is driven from here.
+// The stages. Chapter 1 is the journey home; chapter 2 (stages-world.js) is a trip round the
+// world. Everything visual about a stage is driven from its entry.
 
-export const STAGES = [
+import { WORLD_STAGES } from './stages-world.js';
+
+const HOME_STAGES = [
   {
     id: 'meadow',
     name: 'Dawn Meadow',
@@ -252,7 +255,13 @@ export const STAGES = [
   },
 ];
 
-export const CHARACTERS = {
-  girl: { name: 'Mila', accent: '#e0644a', accent2: '#f2b36b' },
-  boy: { name: 'Arlo', accent: '#2f8f8a', accent2: '#e3b04b' },
-};
+export const STAGES = [...HOME_STAGES, ...WORLD_STAGES];
+
+/** Chapters group stages on the map; the last stage of each has its own ending. */
+export const CHAPTERS = [
+  { name: 'The Long Run Home', subtitle: 'One day, six places, one cabin', from: 0, to: HOME_STAGES.length - 1 },
+  { name: 'Postcards from Away', subtitle: 'Six places round the world', from: HOME_STAGES.length, to: HOME_STAGES.length + WORLD_STAGES.length - 1 },
+];
+
+/** Everyone who can run lives in cast.js; CHARACTERS is kept as the old name for it. */
+export { ROSTER as CHARACTERS } from './cast.js';

@@ -42,6 +42,32 @@ export const SKINS = {
   laundry: { kind: 'over', w: [100, 170], h: [52, 64] },
   pipe: { kind: 'over', w: [120, 220], h: [26, 32] },
   icebeam: { kind: 'over', w: [100, 160], h: [38, 48] },
+
+  // ---- chapter 2: round the world
+  pots: { kind: 'solid', w: [50, 66], h: [38, 46] },
+  sheaf: { kind: 'solid', w: [44, 58], h: [36, 46] },
+  basket: { kind: 'solid', w: [42, 54], h: [30, 40] },
+  bamboofence: { kind: 'hazard', w: [62, 90], h: [36, 42] },
+  column: { kind: 'solid', w: [72, 110], h: [32, 40] },
+  stoneBlock: { kind: 'solid', w: [50, 70], h: [36, 46] },
+  planter: { kind: 'solid', w: [56, 76], h: [30, 40] },
+  bench: { kind: 'solid', w: [70, 92], h: [34, 40] },
+  thorn: { kind: 'hazard', w: [50, 70], h: [40, 50] },
+  drum: { kind: 'solid', w: [50, 64], h: [40, 46] },
+  giftboxes: { kind: 'solid', w: [50, 62], h: [38, 46] },
+  ruinBlock: { kind: 'solid', w: [110, 180], h: [76, 92] },
+  strawstack: { kind: 'solid', w: [90, 130], h: [78, 90] },
+  stepBlock: { kind: 'solid', w: [120, 180], h: [78, 94] },
+  wellhead: { kind: 'solid', w: [72, 92], h: [74, 88] },
+  termite: { kind: 'solid', w: [70, 100], h: [80, 96] },
+  stallTall: { kind: 'solid', w: [110, 150], h: [80, 94] },
+  awning: { kind: 'over', w: [90, 150], h: [40, 54] },
+  bamboo: { kind: 'over', w: [100, 170], h: [30, 40] },
+  lintel: { kind: 'over', w: [70, 120], h: [34, 46] },
+  roots: { kind: 'over', w: [70, 110], h: [46, 60] },
+  cafeAwning: { kind: 'over', w: [100, 160], h: [34, 46] },
+  acacia: { kind: 'over', w: [100, 160], h: [40, 56] },
+  lanternString: { kind: 'over', w: [110, 190], h: [30, 40] },
 };
 
 export const stageLength = (stage, diff) => Math.round(stage.length * diff.lengthMul);
@@ -296,7 +322,7 @@ def('swing', { minTier: 0.6 }, (c) => {
   const L = 168;
   const A = lerp(0.6, 0.85, rng());
   const P = speed * lerp(1.9, 1.5, c.tier / 3) * (c.kids ? 1.3 : 1);
-  c.L.movers.push({ type: 'swing', skin: 'hook', ax, ay: b.y - 236, L, A, P, phase: rng() * P, r: 17, ground: b.y, cx: ax });
+  c.L.movers.push({ type: 'swing', skin: c.stage.skins.swing || 'hook', ax, ay: b.y - 236, L, A, P, phase: rng() * P, r: 17, ground: b.y, cx: ax });
   b.coinLine(ax - 110, ax + 110, b.y - 16, 7);
   b.x = ax + 170;
 });

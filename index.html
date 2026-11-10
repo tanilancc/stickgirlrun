@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#14110f">
-  <meta name="description" content="Mila and Arlo have one day to get home. A hand-crafted stick girl & stick boy running game in six stages, for kids and for teens and adults.">
+  <meta name="description" content="Mila and Arlo have one day to get home. A hand-crafted stick girl & stick boy running game in twelve stages, for kids and for teens and adults: one long day home, then a trip round the world.">
   <title>The Long Run Home</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314110f'/%3E%3Cg stroke='%23f3ebdd' stroke-width='2.6' stroke-linecap='round' fill='none'%3E%3Cpath d='M15 13l2 7-4 6M17 20l5 4M15 14l-5 3M15 14l6 1'/%3E%3C/g%3E%3Ccircle cx='17' cy='8.5' r='3.4' fill='%23f3ebdd'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,17 +19,18 @@
     <!-- Title -->
     <section class="screen" id="screen-title" aria-labelledby="game-title">
       <div class="title-block">
-        <p class="eyebrow">A stick-figure run in six stages</p>
+        <p class="eyebrow">A stick-figure run in twelve stages</p>
         <h1 class="game-title" id="game-title">The Long<br><em>Run</em> Home</h1>
-        <p class="lede">Mila and Arlo have one day to get home: across a wet meadow, through the misty pines, over a red canyon, the old town rooftops, a harbour in a storm and a frozen mountain pass.</p>
+        <p class="lede">Mila and Arlo have one day to get home: across a wet meadow, through the misty pines, over a red canyon, the old town rooftops, a harbour in a storm and a frozen mountain pass. Then the postcards start arriving.</p>
 
         <div class="field">
           <span class="label" id="lbl-runner">Who runs</span>
           <div class="choice" id="pick-runner" role="radiogroup" aria-labelledby="lbl-runner">
-            <button type="button" role="radio" data-value="girl"><canvas width="68" height="88" data-fig="girl"></canvas><span>Mila<small>stick girl</small></span></button>
-            <button type="button" role="radio" data-value="boy"><canvas width="68" height="88" data-fig="boy"></canvas><span>Arlo<small>stick boy</small></span></button>
+            <button type="button" role="radio" data-value="a"><canvas width="68" height="88" data-fig="a"></canvas><span><span class="who" data-name="0">Mila</span><small data-tag="0">stick girl</small></span></button>
+            <button type="button" role="radio" data-value="b"><canvas width="68" height="88" data-fig="b"></canvas><span><span class="who" data-name="1">Arlo</span><small data-tag="1">stick boy</small></span></button>
             <button type="button" role="radio" data-value="duo"><canvas width="68" height="88" data-fig="duo"></canvas><span>Both<small>two players</small></span></button>
           </div>
+          <button type="button" class="link-btn" id="btn-cast">Choose from the cast <span aria-hidden="true">→</span></button>
         </div>
 
         <div class="field">
@@ -54,6 +55,24 @@
         <p class="map-sub" id="map-sub"></p>
       </header>
       <ol class="route" id="route"></ol>
+    </section>
+
+    <!-- Cast -->
+    <section class="screen" id="screen-cast" aria-labelledby="cast-title">
+      <header class="map-head">
+        <button type="button" class="back" id="btn-cast-back">← Back</button>
+        <h2 id="cast-title">The cast</h2>
+        <p class="map-sub">Pick a runner for each spot. Running alone uses the one you pick on the title screen.</p>
+      </header>
+      <div class="slots" role="tablist" aria-label="Runner spots">
+        <button type="button" role="tab" class="slot" data-slot="0"><span class="slot-no">Runner one</span><span class="slot-name" data-name="0"></span></button>
+        <button type="button" role="tab" class="slot" data-slot="1"><span class="slot-no">Runner two</span><span class="slot-name" data-name="1"></span></button>
+      </div>
+      <div class="cast-foot">
+        <label class="rename"><span class="label">Name for this runner</span><input id="cast-name" maxlength="16" autocomplete="off" spellcheck="false"></label>
+        <button type="button" class="cta" id="btn-cast-done">Done <span aria-hidden="true">→</span></button>
+      </div>
+      <ol class="cast-grid" id="cast-grid"></ol>
     </section>
 
     <!-- HUD -->
@@ -110,12 +129,13 @@
     <!-- Ending -->
     <section class="screen" id="screen-ending" aria-labelledby="end-title">
       <div class="end-block">
-        <p class="eyebrow">Stage six · Frozen Pass</p>
+        <p class="eyebrow" id="end-eyebrow">Stage six · Frozen Pass</p>
         <h2 class="game-title" id="end-title">Home.</h2>
         <p class="lede" id="end-text"></p>
-        <p class="end-note">The long way round is open now: an endless road through all six places.</p>
+        <p class="end-note" id="end-note"></p>
         <dl class="stats light" id="end-stats"></dl>
         <div class="btn-row">
+          <button type="button" class="cta" id="btn-end-next">Chapter two <span aria-hidden="true">→</span></button>
           <button type="button" class="cta" id="btn-end-endless">Keep running <span aria-hidden="true">→</span></button>
           <button type="button" class="btn-light" id="btn-end-map">Back to the map</button>
         </div>

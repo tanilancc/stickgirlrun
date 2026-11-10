@@ -189,7 +189,7 @@ export class Weather {
     this.birdT = 3 + Math.random() * 4;
     this.tumble = null;
     this.tumbleT = 6;
-    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190 };
+    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190, drizzle: 150, butterflies: 9, lanterns: 26 };
     const n = counts[this.kind] || 0;
     for (let i = 0; i < n; i++) this.items.push(this.spawn(true));
   }
@@ -200,6 +200,17 @@ export class Weather {
     if (this.kind === 'leaves') o.col = this.P.leaves[Math.floor(Math.random() * this.P.leaves.length)];
     if (this.kind === 'sand') o.y = lerp(view.top + 40, view.bottom, Math.random());
     if (this.kind === 'pollen' || this.kind === 'dusk') o.y = lerp(250, 430, Math.random());
+    if (this.kind === 'butterflies') {
+      o.y = lerp(250, 410, Math.random());
+      o.col = ['#f2c14e', '#e86a3a', '#9ad0f0', '#f4f0e6', '#c86ad8'][Math.floor(Math.random() * 5)];
+      o.home = o.y;
+    }
+    if (this.kind === 'lanterns') {
+      // sky lanterns: released from the river below, drifting up and away
+      o.y = anywhere ? lerp(view.top, 380, Math.random()) : view.bottom + 20;
+      o.v = 9 + Math.random() * 14;
+      o.z = 0.2 + Math.random() * 0.8;
+    }
     return o;
   }
 
@@ -221,6 +232,15 @@ export class Weather {
       } else if (k === 'rain') {
         o.y += (950 + 450 * o.z) * dt;
         o.x -= 200 * o.z * dt;
+      } else if (k === 'drizzle') {
+        o.y += (520 + 260 * o.z) * dt;
+        o.x -= 70 * o.z * dt;
+      } else if (k === 'butterflies') {
+        o.x += (Math.sin(t * 0.7 + o.ph) * 30 + 12) * dt;
+        o.y = o.home + Math.sin(t * 1.9 + o.ph) * 18 + Math.sin(t * 5.3 + o.ph * 2) * 4;
+      } else if (k === 'lanterns') {
+        o.y -= o.v * (0.5 + o.z) * dt;
+        o.x += Math.sin(t * 0.3 + o.ph) * 5 * dt;
       } else if (k === 'snow') {
         const gust = 60 + Math.sin(t * 0.35) * 50 + Math.sin(t * 1.3 + o.ph) * 20;
         o.y += (36 + 60 * o.z) * dt;
@@ -233,7 +253,10 @@ export class Weather {
       }
       if (o.x < -60) o.x += view.w + 120;
       if (o.x > view.w + 60) o.x -= view.w + 120;
-      if (o.y < view.top - 40) o.y = view.bottom;
+      if (o.y < view.top - 40) {
+        if (k === 'lanterns') Object.assign(o, this.spawn(false, view));
+        else o.y = view.bottom;
+      }
     }
     if (wantBirds) {
       this.birdT -= dt;
@@ -346,6 +369,53 @@ export class Weather {
         }
         ctx.stroke();
       }
+    } else if (k === 'drizzle') {
+      ctx.lineWidth = 1;
+      for (let layer = 0; layer < 2; layer++) {
+        ctx.strokeStyle = alpha(mix(P.light, '#c8d8d0', 0.5), layer ? 0.32 : 0.14);
+        ctx.beginPath();
+        for (const o of this.items) {
+          if ((o.z > 0.6) !== !!layer) continue;
+          const len = 6 + o.z * 10;
+          ctx.moveTo(o.x, o.y);
+          ctx.lineTo(o.x + len * 0.12, o.y - len);
+        }
+        ctx.stroke();
+      }
+    } else if (k === 'butterflies') {
+      for (const o of this.items) {
+        const flap = Math.abs(Math.sin(t * 14 + o.ph));
+        const s = 2 + o.z * 2.6;
+        ctx.fillStyle = alpha(o.col, 0.55 + o.z * 0.4);
+        for (const d of [-1, 1]) {
+          ctx.beginPath();
+          ctx.ellipse(o.x + d * s * 0.6 * flap, o.y - s * 0.3, s * flap + 0.4, s * 0.8, d * 0.5, 0, TAU);
+          ctx.fill();
+        }
+        ctx.fillStyle = alpha(P.ink, 0.6);
+        ctx.fillRect(o.x - 0.5, o.y - s * 0.6, 1, s * 1.1);
+      }
+    } else if (k === 'lanterns') {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (const o of this.items) {
+        const r = 1.2 + o.z * 3.4;
+        const flick = 0.8 + 0.2 * Math.sin(t * 7 + o.ph);
+        const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, r * 5);
+        g.addColorStop(0, alpha('#ffb060', 0.32 * o.z * flick));
+        g.addColorStop(1, alpha('#ffb060', 0));
+        ctx.fillStyle = g;
+        ctx.fillRect(o.x - r * 5, o.y - r * 5, r * 10, r * 10);
+        ctx.fillStyle = alpha('#ffd890', (0.45 + 0.5 * o.z) * flick);
+        ctx.beginPath();
+        ctx.moveTo(o.x - r * 0.8, o.y - r);
+        ctx.lineTo(o.x + r * 0.8, o.y - r);
+        ctx.lineTo(o.x + r * 0.6, o.y + r);
+        ctx.lineTo(o.x - r * 0.6, o.y + r);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
     } else if (k === 'snow') {
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       for (const o of this.items) {
@@ -396,6 +466,12 @@ export class Post {
     } else if (stage.id === 'snow') {
       tod = (1 - clamp(progress * 1.4, 0, 1)) * 0.28;
       todCol = '#06102a';
+    } else if (stage.id === 'savanna') {
+      tod = progress * 0.2;
+      todCol = '#2a0a26';
+    } else if (stage.id === 'canals') {
+      tod = progress * 0.1;
+      todCol = '#2a1430';
     }
     if (tod > 0.003) {
       ctx.fillStyle = alpha(todCol, tod);

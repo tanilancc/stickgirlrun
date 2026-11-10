@@ -63,3 +63,28 @@ test('kids levels are gentler than teen/adult levels', () => {
     assert.equal(k.movers.filter((m) => m.type !== 'swing').length, 0, 'no rollers or icicles for kids');
   }
 });
+
+test('every stage only names props, terrains and chapters that exist', async () => {
+  const { SKINS } = await import('../src/level.js');
+  const { CHAPTERS } = await import('../src/stages.js');
+  const ids = new Set();
+  for (const st of STAGES) {
+    assert.ok(!ids.has(st.id), `duplicate stage id ${st.id}`);
+    ids.add(st.id);
+    for (const group of ['low', 'high', 'tall', 'stairs']) {
+      for (const skin of st.skins[group] || []) {
+        assert.ok(SKINS[skin], `${st.id}: unknown ${group} skin "${skin}"`);
+        assert.equal(SKINS[skin].kind === 'over', group === 'high', `${st.id}: "${skin}" is in the wrong group`);
+      }
+    }
+    if (st.weights.roller) assert.ok(st.skins.roller, `${st.id}: spawns rollers but names no roller skin`);
+  }
+  // chapters cover every stage exactly once, in order
+  let next = 0;
+  for (const c of CHAPTERS) {
+    assert.equal(c.from, next);
+    assert.ok(c.to >= c.from);
+    next = c.to + 1;
+  }
+  assert.equal(next, STAGES.length);
+});

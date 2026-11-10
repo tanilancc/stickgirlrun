@@ -6,6 +6,7 @@ import { hash, mulberry32 } from './rng.js';
 import { GROUND_Y } from './config.js';
 import { segIndexAt, obstacleStart, lowerBound, moverState } from './level.js';
 import { clamp, mix, alpha, TAU, fract } from './util.js';
+import { WORLD_SEG, WATERY, worldPit, WORLD_OB, worldRoller, worldSwing, WORLD_DECOR, worldForeground, drawPavilion } from './art-world.js';
 
 export function makeTone(P) {
   const cache = new Map();
@@ -19,7 +20,7 @@ export function makeTone(P) {
   };
 }
 
-function rr(ctx, x, y, w, h, r) {
+export function rr(ctx, x, y, w, h, r) {
   r = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -30,7 +31,7 @@ function rr(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-const vg = (ctx, y0, y1, a, b, c) => {
+export const vg = (ctx, y0, y1, a, b, c) => {
   const g = ctx.createLinearGradient(0, y0, 0, y1);
   g.addColorStop(0, a);
   if (c) {
@@ -40,7 +41,7 @@ const vg = (ctx, y0, y1, a, b, c) => {
   return g;
 };
 
-function blobPts(seed, n, w, h, flatBottom = true) {
+export function blobPts(seed, n, w, h, flatBottom = true) {
   const rng = mulberry32(seed);
   const pts = [];
   for (let i = 0; i < n; i++) {
@@ -54,7 +55,7 @@ function blobPts(seed, n, w, h, flatBottom = true) {
   return pts;
 }
 
-function poly(ctx, x, y, pts) {
+export function poly(ctx, x, y, pts) {
   ctx.beginPath();
   ctx.moveTo(x + pts[0][0], y + pts[0][1]);
   for (let i = 1; i < pts.length; i++) ctx.lineTo(x + pts[i][0], y + pts[i][1]);
@@ -88,9 +89,9 @@ export function drawTerrain(ctx, L, look, view, cam, t) {
     const s = segs[i];
     if (s.x0 > x1) break;
     const k = look(s.th);
-    if (k.st.terrain !== 'harbor') continue;
+    if (!WATERY.has(k.st.terrain)) continue;
     const next = segs[i + 1];
-    const end = next && look(next.th).st.terrain === 'harbor' ? next.x0 : s.x1;
+    const end = next && WATERY.has(look(next.th).st.terrain) ? next.x0 : s.x1;
     drawWater(ctx, k.P, Math.max(s.x0, x0), Math.min(end, x1), bottom, t);
   }
   for (let i = first; i < segs.length; i++) {
@@ -104,7 +105,7 @@ export function drawTerrain(ctx, L, look, view, cam, t) {
     const sx0 = Math.max(s.x0, x0);
     const sx1 = Math.min(s.x1, x1);
     const k = look(s.th);
-    SEG[k.st.terrain](ctx, s, sx0, sx1, bottom, k.P, k.T, t, openL, openR);
+    (SEG[k.st.terrain] || WORLD_SEG[k.st.terrain])(ctx, s, sx0, sx1, bottom, k.P, k.T, t, openL, openR);
   }
 }
 
@@ -117,7 +118,7 @@ function drawWater(ctx, P, x0, x1, bottom, t) {
   ctx.beginPath();
   ctx.rect(x0, wy, x1 - x0, bottom - wy);
   ctx.clip();
-  ctx.strokeStyle = alpha('#9db4c8', 0.18);
+  ctx.strokeStyle = alpha(P.seaGlint || '#9db4c8', P.seaGlint ? 0.24 : 0.18);
   ctx.lineWidth = 1;
   for (let k = 0; k < 26; k++) {
     const yy = wy + 4 + k * 7;
@@ -137,6 +138,7 @@ function drawPit(ctx, terr, P, T, a, b, bottom, t) {
   const top = Math.max(a.y, b.y) + 1;
   const x0 = a.x1;
   const w = b.x0 - a.x1;
+  if (worldPit(ctx, terr, P, T, a, b, bottom, t)) return;
   if (terr === 'meadow' || terr === 'forest') {
     ctx.fillStyle = vg(ctx, top, top + 120, T(mix(P.ground.body, '#000000', 0.35)), T(P.ground.deep));
     ctx.fillRect(x0, top, w, bottom - top);
@@ -185,7 +187,7 @@ function drawPit(ctx, terr, P, T, a, b, bottom, t) {
   }
 }
 
-function edgeShade(ctx, s, sx0, sx1, bottom, openL, openR, col) {
+export function edgeShade(ctx, s, sx0, sx1, bottom, openL, openR, col) {
   if (openL && s.x0 >= sx0 - 1) {
     const g = ctx.createLinearGradient(s.x0, 0, s.x0 + 14, 0);
     g.addColorStop(0, col);
@@ -202,7 +204,7 @@ function edgeShade(ctx, s, sx0, sx1, bottom, openL, openR, col) {
   }
 }
 
-function blades(ctx, s, sx0, sx1, col, hMin, hVar, step, lean = 0) {
+export function blades(ctx, s, sx0, sx1, col, hMin, hVar, step, lean = 0) {
   ctx.strokeStyle = col;
   ctx.lineWidth = 1.3;
   ctx.beginPath();
@@ -464,7 +466,7 @@ const SEG = {
 
 // ---------------------------------------------------------------- obstacles
 
-function woodGrad(ctx, y, h, T, light = '#94693f', mid = '#6b4628', dark = '#3b2516') {
+export function woodGrad(ctx, y, h, T, light = '#94693f', mid = '#6b4628', dark = '#3b2516') {
   return vg(ctx, y, y + h, T(light), T(mid), T(dark));
 }
 
@@ -492,7 +494,7 @@ function drawBale(ctx, x, y, w, h, T, seed) {
   ctx.stroke();
 }
 
-function drawRock(ctx, o, T, base, snow, moss, light) {
+export function drawRock(ctx, o, T, base, snow, moss, light) {
   if (!o._pts) o._pts = blobPts(o.seed, 9, o.w, o.h);
   const g = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h);
   g.addColorStop(0, T(mix(base, light, 0.35)));
@@ -521,7 +523,7 @@ function drawRock(ctx, o, T, base, snow, moss, light) {
   }
 }
 
-function backPost(ctx, x, yTop, yBot, w, col) {
+export function backPost(ctx, x, yTop, yBot, w, col) {
   ctx.fillStyle = col;
   ctx.fillRect(x - w / 2, yTop, w, yBot - yTop);
 }
@@ -581,7 +583,8 @@ const OB = {
     if (o.w > 140) drawBale(ctx, o.x + bw * 1.55, o.y + 6, bw * 0.45, hh - 6, T, o.seed + 9);
   },
   rock(ctx, o, T, P, t, st) {
-    drawRock(ctx, o, T, st.terrain === 'canyon' ? '#a0583a' : st.terrain === 'snow' ? '#5a6478' : '#7d7a72', st.terrain === 'snow', st.terrain === 'forest', P.light);
+    const base = { canyon: '#a0583a', snow: '#5a6478', dunes: '#b88a5a', savanna: '#8a5a3e', ruins: '#7a7666', terraces: '#6e6c62' }[st.terrain] || '#7d7a72';
+    drawRock(ctx, o, T, base, st.terrain === 'snow', st.terrain === 'forest' || st.terrain === 'ruins' || st.terrain === 'terraces', P.light);
   },
   boulderBig(ctx, o, T, P) {
     drawRock(ctx, o, T, '#6f6e66', false, true, P.light);
@@ -995,7 +998,7 @@ export function drawObstacles(ctx, L, look, view, cam, t) {
     const o = obs[i];
     if (o.x > x1) break;
     if (o.x + o.w < x0) continue;
-    const f = OB[o.skin];
+    const f = OB[o.skin] || WORLD_OB[o.skin];
     if (!f) continue;
     const k = look(o.th);
     f(ctx, o, k.T, k.P, t, k.st);
@@ -1014,7 +1017,7 @@ export function drawMovers(ctx, L, look, view, cam, d, t) {
     if (s.x < x0 || s.x > x1) continue;
     const { T, P } = look(m.th);
     if (m.type === 'roller') drawRoller(ctx, m, s, T, P);
-    else if (m.type === 'swing') drawSwing(ctx, m, s, T, P);
+    else if (m.type === 'swing') drawSwing(ctx, m, s, T, P, t);
     else drawIcicle(ctx, m, s, T, t);
   }
 }
@@ -1028,7 +1031,9 @@ function drawRoller(ctx, m, s, T, P) {
   ctx.ellipse(0, r - 1, r * 0.9, 3, 0, 0, TAU);
   ctx.fill();
   ctx.rotate(rot);
-  if (m.skin === 'hayroll') {
+  if (worldRoller(ctx, m, r, T, P)) {
+    /* chapter 2 skins */
+  } else if (m.skin === 'hayroll') {
     ctx.fillStyle = T('#d9b466');
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, TAU);
@@ -1100,7 +1105,8 @@ function drawRoller(ctx, m, s, T, P) {
   ctx.fill();
 }
 
-function drawSwing(ctx, m, s, T, P) {
+function drawSwing(ctx, m, s, T, P, t) {
+  if (worldSwing(ctx, m, s, T, P, t)) return;
   const ax = m.ax;
   const ay = m.ay - 260;
   const dx = s.x - m.ax;
@@ -1411,7 +1417,7 @@ export function drawDecor(ctx, L, look, view, cam) {
   for (let i = lowerBound(dec, x0); i < dec.length; i++) {
     const d = dec[i];
     if (d.x > x1) break;
-    const f = DECOR[d.skin];
+    const f = DECOR[d.skin] || WORLD_DECOR[d.skin];
     if (!f) continue;
     const k = look(d.th);
     f(ctx, d, k.T, k.P);
@@ -1559,6 +1565,8 @@ export function drawFinish(ctx, L, stage, P, T, t, open) {
   const y = L.finishY;
   if (stage.id === 'snow') {
     drawCabin(ctx, x + 380, y, T, P, t, open);
+  } else if (stage.id === 'lanterns') {
+    drawPavilion(ctx, x + 500, y, T, P, t, open);
   }
   const post = T('#5a4230');
   ctx.fillStyle = post;
@@ -1675,7 +1683,9 @@ export function buildForeground(stage) {
   g.lineCap = 'round';
   for (let x = 60; x < W - 60; x += 380 + rng() * 520) {
     const kind = stage.terrain;
-    if (kind === 'meadow' || kind === 'forest') {
+    if (worldForeground(g, kind, x, H, rng)) {
+      /* chapter 2 kinds */
+    } else if (kind === 'meadow' || kind === 'forest') {
       for (let k = 0; k < 18; k++) {
         const a = -Math.PI / 2 + (rng() - 0.5) * 1.6;
         const l = 60 + rng() * 80;

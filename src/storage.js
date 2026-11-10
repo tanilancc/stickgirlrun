@@ -1,12 +1,16 @@
 // Progress + settings in localStorage. Every access is guarded: private windows and blocked
 // storage simply fall back to an in-memory state so the game always runs.
 
+import { ROSTER, DEFAULT_TEAM } from './cast.js';
+
 const KEY = 'long-run-home.v1';
-const STAGES = 6;
+const STAGES = 12;
+const CHAPTER_ONE = 6;
 
 function defaults() {
   const track = () => ({ unlocked: 1, stars: Array(STAGES).fill(0), coins: Array(STAGES).fill(0), endlessBest: 0, endlessCoins: 0 });
-  return { settings: { runner: 'girl', diff: 'kids', muted: false }, progress: { kids: track(), adult: track() } };
+  // runner: 'a' or 'b' (one of the two team slots running alone) or 'duo'
+  return { settings: { runner: 'a', team: [...DEFAULT_TEAM], names: {}, diff: 'kids', muted: false }, progress: { kids: track(), adult: track() } };
 }
 
 export function load() {
@@ -15,11 +19,26 @@ export function load() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return d;
     const s = JSON.parse(raw);
+    // Saves from before chapter 2 hold six-stage arrays: pad them to the current length.
+    const track = (def, saved = {}) => {
+      const t = { ...def, ...saved };
+      t.stars = Array.from({ length: STAGES }, (_, i) => (saved.stars && saved.stars[i]) || 0);
+      t.coins = Array.from({ length: STAGES }, (_, i) => (saved.coins && saved.coins[i]) || 0);
+      return t;
+    };
+    const settings = { ...d.settings, ...(s.settings || {}) };
+    // saves from before the cast: 'girl' / 'boy' were Mila / Arlo running alone
+    if (settings.runner === 'girl') settings.runner = 'a';
+    if (settings.runner === 'boy') settings.runner = 'b';
+    if (!['a', 'b', 'duo'].includes(settings.runner)) settings.runner = 'a';
+    const team = Array.isArray(settings.team) ? settings.team.filter((id) => ROSTER[id]) : [];
+    settings.team = team.length === 2 && team[0] !== team[1] ? team : [...DEFAULT_TEAM];
+    settings.names = settings.names && typeof settings.names === 'object' ? settings.names : {};
     return {
-      settings: { ...d.settings, ...(s.settings || {}) },
+      settings,
       progress: {
-        kids: { ...d.progress.kids, ...(s.progress?.kids || {}) },
-        adult: { ...d.progress.adult, ...(s.progress?.adult || {}) },
+        kids: track(d.progress.kids, s.progress?.kids),
+        adult: track(d.progress.adult, s.progress?.adult),
       },
     };
   } catch {
@@ -47,7 +66,7 @@ export function recordResult(state, diffId, stageIndex, stars, coins) {
 }
 
 /** The endless road opens once the sixth stage has been cleared on that difficulty. */
-export const endlessOpen = (state, diffId) => (state.progress[diffId].stars[STAGES - 1] || 0) > 0;
+export const endlessOpen = (state, diffId) => (state.progress[diffId].stars[CHAPTER_ONE - 1] || 0) > 0;
 
 /** Record an endless run; returns true for a new best distance. */
 export function recordEndless(state, diffId, metres, coins) {

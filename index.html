@@ -26,10 +26,11 @@
         <div class="field">
           <span class="label" id="lbl-runner">Who runs</span>
           <div class="choice" id="pick-runner" role="radiogroup" aria-labelledby="lbl-runner">
-            <button type="button" role="radio" data-value="girl"><canvas width="68" height="88" data-fig="girl"></canvas><span>Mila<small>stick girl</small></span></button>
-            <button type="button" role="radio" data-value="boy"><canvas width="68" height="88" data-fig="boy"></canvas><span>Arlo<small>stick boy</small></span></button>
+            <button type="button" role="radio" data-value="a"><canvas width="68" height="88" data-fig="a"></canvas><span><span class="who" data-name="0">Mila</span><small data-tag="0">stick girl</small></span></button>
+            <button type="button" role="radio" data-value="b"><canvas width="68" height="88" data-fig="b"></canvas><span><span class="who" data-name="1">Arlo</span><small data-tag="1">stick boy</small></span></button>
             <button type="button" role="radio" data-value="duo"><canvas width="68" height="88" data-fig="duo"></canvas><span>Both<small>two players</small></span></button>
           </div>
+          <button type="button" class="link-btn" id="btn-cast">Choose from the cast <span aria-hidden="true">→</span></button>
         </div>
 
         <div class="field">
@@ -54,6 +55,24 @@
         <p class="map-sub" id="map-sub"></p>
       </header>
       <ol class="route" id="route"></ol>
+    </section>
+
+    <!-- Cast -->
+    <section class="screen" id="screen-cast" aria-labelledby="cast-title">
+      <header class="map-head">
+        <button type="button" class="back" id="btn-cast-back">← Back</button>
+        <h2 id="cast-title">The cast</h2>
+        <p class="map-sub">Pick a runner for each spot. Running alone uses the one you pick on the title screen.</p>
+      </header>
+      <div class="slots" role="tablist" aria-label="Runner spots">
+        <button type="button" role="tab" class="slot" data-slot="0"><span class="slot-no">Runner one</span><span class="slot-name" data-name="0"></span></button>
+        <button type="button" role="tab" class="slot" data-slot="1"><span class="slot-no">Runner two</span><span class="slot-name" data-name="1"></span></button>
+      </div>
+      <div class="cast-foot">
+        <label class="rename"><span class="label">Name for this runner</span><input id="cast-name" maxlength="16" autocomplete="off" spellcheck="false"></label>
+        <button type="button" class="cta" id="btn-cast-done">Done <span aria-hidden="true">→</span></button>
+      </div>
+      <ol class="cast-grid" id="cast-grid"></ol>
     </section>
 
     <!-- HUD -->

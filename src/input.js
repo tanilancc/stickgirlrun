@@ -76,6 +76,9 @@ export class Input {
 
   key(e, down) {
     const code = e.code;
+    // typing a runner's name is not playing
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
     if (down && !e.repeat) {
       if (code === 'Escape' || code === 'KeyP') this.emit('pause');
       if (code === 'KeyM') this.emit('mute');

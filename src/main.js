@@ -1,6 +1,7 @@
 // App controller: game loop, screens, attract mode, audio wiring.
 
-import { STAGES, CHAPTERS, CHARACTERS } from './stages.js';
+import { STAGES, CHAPTERS } from './stages.js';
+import { ROSTER_ORDER, lookOf } from './cast.js';
 import { DT, DIFFICULTY, GROUND_Y } from './config.js';
 import { World } from './game.js';
 import { Renderer } from './renderer.js';
@@ -49,7 +50,17 @@ const STAR = (on) =>
 const HEART = (on) =>
   `<svg viewBox="0 0 24 22" class="${on ? '' : 'lost'}"><path d="M12 20.5C5 15.6 1.6 12 1.6 7.6 1.6 4.4 4 2 7 2c2 0 3.7 1.1 5 2.9C13.3 3.1 15 2 17 2c3 0 5.4 2.4 5.4 5.6 0 4.4-3.4 8-10.4 12.9z" fill="${on ? '#e5484d' : 'none'}" stroke="${on ? '#8a1e22' : '#f3ebdd'}" stroke-width="1.4"/></svg>`;
 
-const runnerLabel = (m) => (m === 'duo' ? 'Mila & Arlo' : CHARACTERS[m].name);
+const esc = (str) => String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+/** A runner's name: the player's own name for them if they gave one, else the cast name. */
+const nameOf = (id) => (store.settings.names[id] || '').trim() || lookOf(id).name;
+const tagOf = (id) => lookOf(id).tag.split(' · ')[0];
+/** The cast ids running right now: one team spot alone, or both. */
+const runningTeam = () => {
+  const t = store.settings.team;
+  const r = store.settings.runner;
+  return r === 'duo' ? [...t] : [t[r === 'b' ? 1 : 0]];
+};
+const runnerLabel = () => runningTeam().map(nameOf).join(' & ');
 const fmtNum = (n) => Math.round(n).toLocaleString('en-US');
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
@@ -67,7 +78,7 @@ function showScreen(name) {
   // on wide screens keep the runners clear of the text panels on the left
   const wide = window.innerWidth > 900;
   renderer.anchorFrac = wide && name === 'title' ? 0.6 : wide && name === 'ending' ? 0.56 : 0;
-  for (const id of ['title', 'map', 'ending']) $(`screen-${id}`).classList.toggle('active', id === name);
+  for (const id of ['title', 'map', 'cast', 'ending']) $(`screen-${id}`).classList.toggle('active', id === name);
   $('hud').classList.toggle('active', name === 'play');
   $('rotate-hint').classList.toggle('when-playing', name === 'play');
   if (name !== 'play') {
@@ -78,13 +89,14 @@ function showScreen(name) {
 
 function keysHint() {
   const duo = store.settings.runner === 'duo';
+  const [n1, n2] = store.settings.team.map((id) => esc(nameOf(id)));
   if (isTouch) {
     return duo
-      ? 'Left half for Mila, right half for Arlo. Tap high to jump, tap low to slide.'
+      ? `Left half for ${n1}, right half for ${n2}. Tap high to jump, tap low to slide.`
       : 'Tap the right side to jump (hold for higher, tap again to flip). Hold the left side to slide.';
   }
   return duo
-    ? 'Mila: <kbd>W</kbd> jump · <kbd>S</kbd> slide &nbsp; Arlo: <kbd>↑</kbd> jump · <kbd>↓</kbd> slide<br><kbd>Esc</kbd> pause · <kbd>M</kbd> sound'
+    ? `${n1}: <kbd>W</kbd> jump · <kbd>S</kbd> slide &nbsp; ${n2}: <kbd>↑</kbd> jump · <kbd>↓</kbd> slide<br><kbd>Esc</kbd> pause · <kbd>M</kbd> sound`
     : '<kbd>Space</kbd> or <kbd>↑</kbd> jump — hold for higher, tap again in the air to flip<br><kbd>↓</kbd> slide · <kbd>Esc</kbd> pause · <kbd>M</kbd> sound';
 }
 
@@ -108,6 +120,7 @@ function bindChoice(groupId, key) {
   const sync = () => {
     for (const b of group.querySelectorAll('button')) b.setAttribute('aria-checked', String(b.dataset.value === store.settings[key]));
     $('keys-hint').innerHTML = keysHint();
+    syncWho();
   };
   group.addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -120,13 +133,23 @@ function bindChoice(groupId, key) {
   sync();
 }
 
-const icons = [...document.querySelectorAll('canvas[data-fig]')].map((c) => {
-  const kinds = c.dataset.fig === 'duo' ? ['girl', 'boy'] : [c.dataset.fig];
-  return { c, kind: c.dataset.fig, figs: kinds.map((k) => ({ a: createAnim(k), r: createRunner(k) })) };
-});
+/** Names and tags of the two team spots, wherever the page shows them. */
+function syncWho() {
+  const t = store.settings.team;
+  document.querySelectorAll('[data-name]').forEach((el) => (el.textContent = nameOf(t[+el.dataset.name])));
+  document.querySelectorAll('[data-tag]').forEach((el) => (el.textContent = tagOf(t[+el.dataset.tag])));
+}
+
+const icons = [...document.querySelectorAll('canvas[data-fig]')].map((c) => ({ c, kind: c.dataset.fig, ids: '', figs: [] }));
 
 function drawIcons(dt) {
+  const team = store.settings.team;
   for (const ic of icons) {
+    const ids = ic.kind === 'duo' ? team : [team[ic.kind === 'b' ? 1 : 0]];
+    if (ic.ids !== ids.join()) {
+      ic.ids = ids.join();
+      ic.figs = ids.map((k) => ({ a: createAnim(k), r: createRunner(k) }));
+    }
     const g = ic.c.getContext('2d');
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, ic.c.width, ic.c.height);
@@ -175,8 +198,9 @@ function makeThumb(i) {
   };
   g.save();
   g.translate(0, 0);
-  fig('boy', 250, 0.55);
-  fig('girl', 320, 0.12);
+  const [t0, t1] = store.settings.team;
+  fig(t1, 250, 0.55);
+  fig(t0, 320, 0.12);
   g.restore();
   thumbs.set(i, c);
   return c;
@@ -219,7 +243,7 @@ function makeEndlessThumb() {
 function openMap() {
   const diff = store.settings.diff;
   const prog = store.progress[diff];
-  $('map-sub').textContent = `${runnerLabel(store.settings.runner)} · ${DIFFICULTY[diff].label}`;
+  $('map-sub').textContent = `${runnerLabel()} · ${DIFFICULTY[diff].label}`;
   const route = $('route');
   route.innerHTML = '';
   const canvases = [];
@@ -290,11 +314,20 @@ function openMap() {
 
 // ---------------------------------------------------------------- attract mode
 
-function startAttract(i) {
+/** Attract mode shows the player's own pair first, then random pairs from the cast. */
+function randomPair() {
+  const pick = () => ROSTER_ORDER[Math.floor(Math.random() * ROSTER_ORDER.length)];
+  const a = pick();
+  let b = pick();
+  while (b === a) b = pick();
+  return [a, b];
+}
+
+function startAttract(i, team = null) {
   app.attract = true;
   app.attractIdx = i % STAGES.length;
   app.attractT = 0;
-  const w = new World({ stageIndex: app.attractIdx, diffId: 'adult', mode: 'duo', autopilot: true, invincible: true });
+  const w = new World({ stageIndex: app.attractIdx, diffId: 'adult', team: team || randomPair(), autopilot: true, invincible: true });
   app.world = w;
   renderer.setWorld(w);
   input.enabled = false;
@@ -310,9 +343,10 @@ function startStage(i) {
     app.acc = 0;
     app.current = i;
     app.hud = { coins: -1, hearts: -2, metres: -1 };
-    const mode = store.settings.runner;
+    const team = runningTeam();
+    const mode = team.length > 1 ? 'duo' : 'solo';
     const endless = i === ENDLESS;
-    const w = new World({ stageIndex: endless ? 0 : i, diffId: store.settings.diff, mode, endless });
+    const w = new World({ stageIndex: endless ? 0 : i, diffId: store.settings.diff, team, endless });
     w.on(onWorldEvent);
     app.world = w;
     renderer.setWorld(w);
@@ -340,8 +374,9 @@ function hudInit(w) {
   $('hud-dist').style.display = w.endless ? 'block' : 'none';
   $('hud').classList.toggle('endless', w.endless);
   const kinds = w.runners.map((r) => r.kind);
-  $('dot-0').style.background = CHARACTERS[kinds[0]].accent;
+  $('dot-0').style.background = lookOf(kinds[0]).accent;
   $('dot-1').style.display = kinds.length > 1 ? 'block' : 'none';
+  if (kinds[1]) $('dot-1').style.background = lookOf(kinds[1]).accent;
   $('hud-hearts').style.display = w.maxHearts === Infinity ? 'none' : 'flex';
 }
 
@@ -394,9 +429,10 @@ function showTouchHints(mode) {
     el.innerHTML = '';
     return;
   }
+  const [n1, n2] = store.settings.team.map((id) => esc(nameOf(id)));
   el.innerHTML =
     mode === 'duo'
-      ? `<div class="zone" style="left:0;top:0;width:50%;height:62%">Mila · jump</div><div class="zone" style="left:0;top:62%;width:50%;height:38%">Mila · slide</div><div class="zone" style="left:50%;top:0;width:50%;height:62%">Arlo · jump</div><div class="zone" style="left:50%;top:62%;width:50%;height:38%">Arlo · slide</div>`
+      ? `<div class="zone" style="left:0;top:0;width:50%;height:62%">${n1} · jump</div><div class="zone" style="left:0;top:62%;width:50%;height:38%">${n1} · slide</div><div class="zone" style="left:50%;top:0;width:50%;height:62%">${n2} · jump</div><div class="zone" style="left:50%;top:62%;width:50%;height:38%">${n2} · slide</div>`
       : `<div class="zone" style="left:0;top:0;width:40%;height:100%">Hold · slide</div><div class="zone" style="left:40%;top:0;width:60%;height:100%">Tap · jump</div>`;
   el.classList.add('on');
   setTimeout(() => el.classList.remove('on'), 4500);
@@ -574,9 +610,9 @@ const ENDINGS = [
 function showEnding(s, chapter = 0) {
   const diff = store.settings.diff;
   const total = store.progress[diff].stars.reduce((a, b) => a + b, 0);
-  const who = store.settings.runner;
+  const t = runningTeam();
   const e = ENDINGS[chapter] || ENDINGS[0];
-  const subject = (plural, single) => (who === 'duo' ? `Mila and Arlo ${plural}` : `${CHARACTERS[who].name} ${single}`);
+  const subject = (plural, single) => (t.length > 1 ? `${nameOf(t[0])} and ${nameOf(t[1])} ${plural}` : `${nameOf(t[0])} ${single}`);
   $('end-eyebrow').textContent = e.eyebrow;
   $('end-title').textContent = e.title;
   $('end-text').textContent = e.text(subject);
@@ -596,9 +632,95 @@ function showEnding(s, chapter = 0) {
 function backToMap() {
   fadeThrough(() => {
     input.enabled = false;
-    startAttract(app.world && !app.world.endless ? app.world.stageIndex : 0);
+    startAttract(app.world && !app.world.endless ? app.world.stageIndex : 0, store.settings.team);
     openMap();
   });
+}
+
+// ---------------------------------------------------------------- cast
+
+const cast = { slot: 0, cards: [], before: '' };
+
+function openCast() {
+  cast.before = store.settings.team.join();
+  cast.slot = store.settings.runner === 'b' ? 1 : 0;
+  if (!cast.cards.length) buildCastGrid();
+  syncCast();
+  showScreen('cast');
+  if (!isTouch) cast.cards.find((c) => c.id === store.settings.team[cast.slot])?.b.focus({ preventScroll: true });
+}
+
+function buildCastGrid() {
+  const grid = $('cast-grid');
+  grid.innerHTML = '';
+  cast.cards = ROSTER_ORDER.map((id, i) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cast-card';
+    b.style.setProperty('--tilt', `${[-1.2, 0.9, -0.5, 1.2, -0.9, 0.6][i % 6]}deg`);
+    b.innerHTML = `<canvas width="240" height="240"></canvas><span class="badge" hidden></span><span class="name"></span><span class="tag">${esc(lookOf(id).tag)}</span>`;
+    b.addEventListener('click', () => pickCast(id));
+    li.appendChild(b);
+    grid.appendChild(li);
+    return { id, b, c: b.querySelector('canvas'), a: createAnim(id), r: createRunner(id) };
+  });
+}
+
+function pickCast(id) {
+  const t = store.settings.team;
+  const other = 1 - cast.slot;
+  if (t[other] === id) t[other] = t[cast.slot];
+  t[cast.slot] = id;
+  save(store);
+  audio.unlock();
+  audio.click();
+  thumbs.clear();
+  syncCast();
+}
+
+function syncCast(keepInput = false) {
+  const t = store.settings.team;
+  for (const s of document.querySelectorAll('.slot')) s.setAttribute('aria-selected', String(+s.dataset.slot === cast.slot));
+  for (const card of cast.cards) {
+    const k = t.indexOf(card.id);
+    const badge = card.b.querySelector('.badge');
+    badge.hidden = k < 0;
+    badge.textContent = String(k + 1);
+    card.b.setAttribute('aria-pressed', String(k === cast.slot));
+    card.b.querySelector('.name').textContent = nameOf(card.id);
+    card.b.setAttribute('aria-label', `${nameOf(card.id)}, ${lookOf(card.id).tag}${k >= 0 ? `, runner ${k + 1}` : ''}`);
+  }
+  const input = $('cast-name');
+  if (!keepInput) input.value = nameOf(t[cast.slot]);
+  input.placeholder = lookOf(t[cast.slot]).name;
+  syncWho();
+  $('keys-hint').innerHTML = keysHint();
+}
+
+function closeCast() {
+  audio.click();
+  const changed = store.settings.team.join() !== cast.before;
+  if (changed) {
+    fadeThrough(() => {
+      startAttract(app.attractIdx, store.settings.team);
+      showScreen('title');
+    });
+  } else showScreen('title');
+}
+
+function drawCastCards(dt) {
+  const t = store.settings.team;
+  for (const card of cast.cards) {
+    const g = card.c.getContext('2d');
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, card.c.width, card.c.height);
+    const inTeam = t.includes(card.id);
+    const s = 2.15;
+    g.setTransform(s, 0, 0, s, 120 * (1 - s), 214 * (1 - s));
+    updateAnim(card.a, card.r, 120, 214, inTeam ? 330 : 0, dt);
+    drawFigure(g, card.a, { ink: '#1b1816', far: '#5a5048' });
+  }
 }
 
 // ---------------------------------------------------------------- wiring
@@ -611,6 +733,28 @@ $('btn-start').addEventListener('click', () => {
   audio.unlock();
   audio.click();
   openMap();
+});
+$('btn-cast').addEventListener('click', () => {
+  audio.unlock();
+  audio.click();
+  openCast();
+});
+$('btn-cast-back').addEventListener('click', closeCast);
+$('btn-cast-done').addEventListener('click', closeCast);
+for (const s of document.querySelectorAll('.slot')) {
+  s.addEventListener('click', () => {
+    cast.slot = +s.dataset.slot;
+    audio.click();
+    syncCast();
+  });
+}
+$('cast-name').addEventListener('input', (e) => {
+  const id = store.settings.team[cast.slot];
+  const v = e.target.value.trim().slice(0, 16);
+  if (v && v !== lookOf(id).name) store.settings.names[id] = v;
+  else delete store.settings.names[id];
+  save(store);
+  syncCast(true);
 });
 $('btn-map-back').addEventListener('click', () => {
   audio.click();
@@ -645,6 +789,7 @@ $('btn-end-endless').addEventListener('click', () => {
 
 input.on('pause', () => {
   if (app.screen === 'play') setPause(!app.paused);
+  else if (app.screen === 'cast') closeCast();
 });
 input.on('mute', toggleMute);
 input.on('confirm', () => {
@@ -705,10 +850,12 @@ function tick(now) {
     }
   }
   if (app.screen === 'title') drawIcons(dt);
+  if (app.screen === 'cast') drawCastCards(dt);
   requestAnimationFrame(tick);
 }
 
-startAttract(0);
+startAttract(0, store.settings.team);
+syncWho();
 showScreen('title');
 requestAnimationFrame(tick);
 

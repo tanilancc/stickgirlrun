@@ -337,7 +337,8 @@ export class Renderer {
     for (const i of order) {
       const r = w.runners[i];
       const blink = r.invuln > 0 && !r.gliding && w.status === 'run' && !opts.attract ? (Math.floor(t * 14) % 2 ? 0.35 : 0.95) : 1;
-      drawFigure(ctx, this.anims[i], { ink: P.ink, far, outline: P.outline, alpha: blink });
+      // faces and clothes sit in the same light as the stage (darker at night)
+      drawFigure(ctx, this.anims[i], { ink: P.ink, far, outline: P.outline, alpha: blink, shade: P.tint.dark * 0.8 });
     }
     this.particles.draw(ctx);
     ctx.restore();

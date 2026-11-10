@@ -263,7 +263,5 @@ export const CHAPTERS = [
   { name: 'Postcards from Away', subtitle: 'Six places round the world', from: HOME_STAGES.length, to: HOME_STAGES.length + WORLD_STAGES.length - 1 },
 ];
 
-export const CHARACTERS = {
-  girl: { name: 'Mila', accent: '#e0644a', accent2: '#f2b36b' },
-  boy: { name: 'Arlo', accent: '#2f8f8a', accent2: '#e3b04b' },
-};
+/** Everyone who can run lives in cast.js; CHARACTERS is kept as the old name for it. */
+export { ROSTER as CHARACTERS } from './cast.js';

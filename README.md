@@ -73,6 +73,26 @@ Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
 
+## The cast
+
+Mila and Arlo are the ink-silhouette heroes of the story, but anyone in the cast can run. **Choose
+from the cast** on the title screen opens a picker with eight more runners drawn from stick-figure
+portraits: round heads with faces, their own hair (messy, swept, braids, curls, waves, a bob, a
+ponytail), glasses, bindis, earrings, a beard, and the clothes from their pictures, from a printed
+shirt and a striped polo to a cardigan, a blazer, a pinafore, a polka-dot tutu and a blue dress
+with gold dots. Pick one runner for each of the two spots; solo play uses either spot, and duo uses
+both. Every runner can be renamed on that screen, and the names stay on the player's device.
+
+![The cast](docs/screenshots/cast.jpg)
+
+They use the same skeleton, IK and physics as Mila and Arlo, so any runner can clear every stage.
+Ponytails, braids and long hair are verlet chains that stream and bounce as they run. Faces and
+clothes are lit by the stage, so they darken at night and pick up the outline in the dark stages.
+The children in the cast are drawn a little smaller. The title screen's attract mode shows your
+pair first, then random pairs from the cast.
+
+![Two of the cast in Canal City](docs/screenshots/cast-canal.jpg)
+
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
@@ -162,7 +182,8 @@ src/runner.js               runner physics                              (pure, t
 src/bot.js                  simulation-based autopilot                  (tested)
 src/endless.js              endless road: streams + prunes the level, landscape legs
 src/game.js                 World: speed, scoring, hearts, rescue, finish
-src/figure.js               skeleton, IK, poses, hair/scarf, drawing
+src/cast.js                 who can run: Mila, Arlo and the portrait cast
+src/figure.js               skeleton, IK, poses, hair/scarf, cast faces and clothes, drawing
 src/backgrounds.js          procedural parallax layers, sky, sun, aurora
 src/backgrounds-world.js    chapter two landscapes, fireworks
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin

@@ -11,8 +11,10 @@ import { EndlessTrack, metres } from './endless.js';
 import { smooth } from './util.js';
 
 export class World {
-  constructor({ stageIndex = 0, diffId = 'adult', mode = 'girl', autopilot = false, invincible = false, endless = false } = {}) {
+  constructor({ stageIndex = 0, diffId = 'adult', mode = 'girl', team = null, autopilot = false, invincible = false, endless = false } = {}) {
     this.diff = DIFFICULTY[diffId];
+    // team: the cast ids running (one, or two for duo); without it the mode names Mila / Arlo
+    if (team) mode = team.length > 1 ? 'duo' : 'solo';
     this.mode = mode;
     this.endless = endless;
     if (endless) {
@@ -26,7 +28,7 @@ export class World {
       this.L = buildLevel(STAGES[stageIndex], this.diff);
     }
     this.stage = STAGES[this.stageIndex];
-    const kinds = mode === 'duo' ? ['girl', 'boy'] : [mode];
+    const kinds = team ? team.slice(0, 2) : mode === 'duo' ? ['girl', 'boy'] : [mode];
     const offs = mode === 'duo' ? [34, -34] : [0];
     this.runners = kinds.map((k, i) => createRunner(k, offs[i], GROUND_Y));
     this.leadOffset = Math.max(...offs);

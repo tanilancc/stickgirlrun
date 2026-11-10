@@ -15,6 +15,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html, body {
   margin: 0;
@@ -264,6 +265,20 @@ kbd {
 .card .stars { display: flex; gap: 2px; }
 .card .stars svg { width: 16px; height: 16px; }
 .card .best { font-family: var(--cond); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 12px; color: #8a5a14; }
+.route li.chapter {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: 8px 0 -14px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(243, 235, 221, 0.22);
+}
+.route li.chapter:not(:first-child) { margin-top: 26px; }
+.route .ch-no { font-family: var(--cond); font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; font-size: 12px; color: var(--gold); }
+.route .ch-name { font-family: var(--serif); font-size: clamp(22px, 2.6vw, 30px); font-weight: 600; letter-spacing: -0.01em; }
+.route .ch-sub { font-family: var(--hand); font-size: 21px; color: var(--muted); }
 .route li.endless { grid-column: span 2; }
 .route li.endless .card canvas, .route li.endless .card .lock { aspect-ratio: 32 / 10; object-fit: cover; }
 .route li.endless .no { font-style: normal; font-size: 17px; line-height: 1; }

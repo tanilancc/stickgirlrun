@@ -4,6 +4,7 @@
 // them like a long lens would. Small animated details ("dyn") are drawn live every frame.
 
 import { mulberry32, hash } from './rng.js';
+import { WORLD_THEMES, drawFireworks } from './backgrounds-world.js';
 import { clamp, mix, alpha, TAU, fract } from './util.js';
 
 export const TW = 2048;
@@ -15,7 +16,7 @@ function canvas(w, h) {
   return c;
 }
 
-function periodic(rng, base, octs, rough = 0.5) {
+export function periodic(rng, base, octs, rough = 0.5) {
   const terms = [];
   let amp = 1;
   let f = base;
@@ -33,7 +34,7 @@ function periodic(rng, base, octs, rough = 0.5) {
   };
 }
 
-function layer(yTop, yBot, par, scale, draw) {
+export function layer(yTop, yBot, par, scale, draw) {
   const h = yBot - yTop;
   const c = canvas(TW * scale, h * scale);
   const g = c.getContext('2d');
@@ -45,19 +46,19 @@ function layer(yTop, yBot, par, scale, draw) {
 }
 
 /** Run fn at x and at its wrapped copies so objects crossing the tile seam stay whole. */
-function each(x, w, fn) {
+export function each(x, w, fn) {
   fn(x);
   if (x - w < 0) fn(x + TW);
   if (x + w > TW) fn(x - TW);
 }
 
-function vgrad(g, y0, y1, stops) {
+export function vgrad(g, y0, y1, stops) {
   const gr = g.createLinearGradient(0, y0, 0, y1);
   for (const [t, c] of stops) gr.addColorStop(t, c);
   return gr;
 }
 
-function ridge(g, fn, yBot, fill) {
+export function ridge(g, fn, yBot, fill) {
   g.beginPath();
   g.moveTo(0, yBot);
   for (let x = 0; x <= TW; x += 4) g.lineTo(x, fn(x));
@@ -68,7 +69,7 @@ function ridge(g, fn, yBot, fill) {
 }
 
 /** Columns shaded by slope: faces turned to the sun are lit, the others fall into shadow. */
-function litColumns(g, fn, yBot, o) {
+export function litColumns(g, fn, yBot, o) {
   const step = o.step || 2;
   const sw = o.smooth || 0;
   // Shade from a smoothed ridge so facets read as broad planes rather than per-column noise.
@@ -102,7 +103,7 @@ function litColumns(g, fn, yBot, o) {
 }
 
 /** Atmospheric perspective: tint everything already painted toward the haze colour. */
-function hazeOver(g, color, y0, y1, a0, a1, top = -400) {
+export function hazeOver(g, color, y0, y1, a0, a1, top = -400) {
   g.save();
   g.globalCompositeOperation = 'source-atop';
   g.fillStyle = alpha(color, a0);
@@ -115,7 +116,7 @@ function hazeOver(g, color, y0, y1, a0, a1, top = -400) {
   g.restore();
 }
 
-function pine(g, x, yb, h, col, rng, snow) {
+export function pine(g, x, yb, h, col, rng, snow) {
   const tiers = Math.max(4, Math.round(h / 20));
   const base = yb - h * 0.12;
   const th = (h * 0.88) / tiers;
@@ -156,7 +157,7 @@ function pine(g, x, yb, h, col, rng, snow) {
   }
 }
 
-function tree(g, x, yb, h, col, rng, hi) {
+export function tree(g, x, yb, h, col, rng, hi) {
   g.fillStyle = col;
   g.beginPath();
   g.moveTo(x - h * 0.05, yb);
@@ -185,7 +186,7 @@ function tree(g, x, yb, h, col, rng, hi) {
   }
 }
 
-function building(g, x, yb, w, h, col, rng, o = {}) {
+export function building(g, x, yb, w, h, col, rng, o = {}) {
   g.fillStyle = col;
   g.fillRect(x, yb - h, w, h);
   const top = yb - h;
@@ -280,7 +281,7 @@ function cloudSprite(w, h, light, shade, rng, flat) {
   return c;
 }
 
-function cloudLayer(P, rng, n, yMin, yMax, flat, alphaMul = 1) {
+export function cloudLayer(P, rng, n, yMin, yMax, flat, alphaMul = 1) {
   const c = canvas(TW * 0.5, 320 * 0.5);
   const g = c.getContext('2d');
   g.scale(0.5, 0.5);
@@ -964,7 +965,8 @@ const THEMES = {
 export function buildBackground(stage) {
   const rng = mulberry32(stage.seed * 31 + 5);
   const P = stage.palette;
-  const theme = THEMES[stage.terrain](P, rng);
+  // looked up at call time so the import cycle with backgrounds-world.js is harmless
+  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain])(P, rng);
   if (theme.fogAfter) {
     for (const k of Object.keys(theme.fogAfter)) theme.fogAfter[k].tile = fogTile(theme.fogAfter[k].color, stage.terrain === 'forest' ? 1.4 : 1);
   }
@@ -1049,6 +1051,9 @@ export function drawBackground(ctx, bg, view, cam, t, progress, flash) {
     ctx.globalAlpha = 1;
   }
 
+  // festival fireworks: a few all night, the full show once you reach the river
+  if (bg.fireworks) drawFireworks(ctx, view, t, 0.45 + 0.55 * clamp((progress - 0.92) / 0.08, 0, 1));
+
   if (bg.sea) drawSea(ctx, bg, view, cam, t, P);
 
   for (let i = 0; i < bg.layers.length; i++) {
@@ -1086,7 +1091,7 @@ function drawSea(ctx, bg, view, cam, t, P) {
   g.addColorStop(1, P.water);
   ctx.fillStyle = g;
   ctx.fillRect(0, y0, view.w, view.bottom - y0);
-  ctx.fillStyle = alpha('#9fb6cc', 0.12);
+  ctx.fillStyle = alpha(P.seaGlint || '#9fb6cc', P.seaGlint ? 0.2 : 0.12);
   for (let i = 0; i < 40; i++) {
     const yy = y0 + 4 + Math.pow(i / 40, 1.6) * 90;
     const w = 20 + hash(i) * 70;
@@ -1169,6 +1174,36 @@ function drawDyn(ctx, d, x, y, t, P) {
     ctx.lineTo(x - 26, y + 72);
     ctx.fill();
     ctx.restore();
+  } else if (d.type === 'paperLantern') {
+    const s = d.s;
+    const sway = Math.sin(t * 1.3 + d.phase) * 0.12;
+    const lx = x + sway * 10 * s;
+    const ly = y + 6 * s;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const glow = ctx.createRadialGradient(lx, ly, 0, lx, ly, 26 * s);
+    glow.addColorStop(0, alpha(P.lamp, 0.4 * (0.9 + 0.1 * Math.sin(t * 9 + d.phase))));
+    glow.addColorStop(1, alpha(P.lamp, 0));
+    ctx.fillStyle = glow;
+    ctx.fillRect(lx - 26 * s, ly - 26 * s, 52 * s, 52 * s);
+    ctx.restore();
+    ctx.strokeStyle = alpha('#000000', 0.5);
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(lx, ly - 5 * s);
+    ctx.stroke();
+    ctx.fillStyle = mix('#e8432e', '#ffb070', 0.25);
+    ctx.beginPath();
+    ctx.ellipse(lx, ly, 5 * s, 6 * s, sway, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = alpha('#ffe0a0', 0.75);
+    ctx.beginPath();
+    ctx.ellipse(lx, ly, 2.4 * s, 4.6 * s, sway, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = '#2a1410';
+    ctx.fillRect(lx - 2.5 * s, ly - 6.5 * s, 5 * s, 1.4 * s);
+    ctx.fillRect(lx - 2.5 * s, ly + 5.2 * s, 5 * s, 1.4 * s);
   }
 }
 

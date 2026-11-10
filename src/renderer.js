@@ -11,7 +11,12 @@ import { createAnim, updateAnim, drawFigure, animLand } from './figure.js';
 import { Particles, Weather, Post, makeBolt, drawBolt } from './fx.js';
 import { clamp, mix, alpha, smooth } from './util.js';
 
-const DUST = { meadow: '#cdb89a', forest: '#8a7a5a', canyon: '#e2b98a', roof: '#a89a90', harbor: '#aac4dc', snow: '#ffffff' };
+const DUST = {
+  meadow: '#cdb89a', forest: '#8a7a5a', canyon: '#e2b98a', roof: '#a89a90', harbor: '#aac4dc', snow: '#ffffff',
+  dunes: '#ecd2a4', terraces: '#a8b8a8', ruins: '#a8a490', canals: '#d8ccb8', savanna: '#d8a868', lanterns: '#c89a70',
+};
+/** Surfaces that throw up water instead of (or as well as) dust. */
+const WET = new Set(['harbor', 'terraces']);
 const FADE = 700;
 const MAX_BGS = 3;
 
@@ -155,7 +160,7 @@ export class Renderer {
       case 'land':
         animLand(this.anims[data.i], data.v);
         this.particles.dust(x, r.y, Math.round(3 + data.v / 200), dust, 1 + data.v / 1400);
-        if (terr === 'harbor') this.particles.splash(x, r.y, 5);
+        if (WET.has(terr)) this.particles.splash(x, r.y, 5);
         break;
       case 'mantle':
         this.particles.dust(x + 8, r.y, 4, dust, 0.6);
@@ -218,7 +223,7 @@ export class Renderer {
       updateAnim(a, r, this.runnerX(r), r.y, w.speed, dt, (side) => {
         const fx = this.runnerX(r) + (side ? -4 : 6);
         if (Math.random() < 0.6) this.particles.dust(fx, r.y, 1, DUST[st.terrain], 0.5);
-        if (st.terrain === 'harbor' && Math.random() < 0.5) this.particles.splash(fx, r.y, 2);
+        if (WET.has(st.terrain) && Math.random() < 0.5) this.particles.splash(fx, r.y, 2);
         if (this.onFootstep) this.onFootstep(st.surface, i);
       });
       if (r.sliding && r.onGround) {
@@ -311,7 +316,7 @@ export class Renderer {
     drawObstacles(ctx, w.L, look, view, this.cam, t);
     drawMovers(ctx, w.L, look, view, this.cam, w.d, t);
     this.rollerDust(w, dt, st);
-    drawCoins(ctx, w.L, view, this.cam, t, st.id === 'harbor' || st.id === 'snow');
+    drawCoins(ctx, w.L, view, this.cam, t, st.id === 'harbor' || st.id === 'snow' || st.id === 'lanterns');
     drawPickups(ctx, w.L, t);
 
     // shadows + runners (the runner further back is drawn first)

@@ -8,6 +8,8 @@ const SCALES = {
   minor: [0, 2, 3, 5, 7, 8, 10],
   minorPent: [0, 2, 3, 5, 7, 8, 10],
   lydian: [0, 2, 4, 6, 7, 9, 11],
+  hijaz: [0, 1, 4, 5, 7, 8, 10],
+  mixolydian: [0, 2, 4, 5, 7, 9, 10],
 };
 
 const STEP = {
@@ -17,6 +19,8 @@ const STEP = {
   roof: { f: 900, q: 1.2, d: 0.06, g: 0.14, thump: 110 },
   wood: { f: 700, q: 1.4, d: 0.07, g: 0.16, thump: 130 },
   snow: { f: 2600, q: 0.5, d: 0.13, g: 0.12 },
+  mud: { f: 520, q: 0.8, d: 0.11, g: 0.15, thump: 80 },
+  stone: { f: 1300, q: 1.6, d: 0.05, g: 0.13, thump: 150 },
 };
 
 const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
@@ -370,6 +374,48 @@ export class AudioEngine {
     } else if (id === 'snow') {
       this.loopNoise('lowpass', 700, 0.6, 0.11, { rate: 0.06, depth: 400, target: 'freq' });
       this.loopNoise('bandpass', 1800, 2, 0.03, { rate: 0.09, depth: 900, target: 'freq' });
+    } else if (id === 'dunes') {
+      // wind singing over the crests, and now and then a camel bell far off
+      this.loopNoise('bandpass', 640, 5, 0.07, { rate: 0.05, depth: 260, target: 'freq' });
+      this.loopNoise('highpass', 2600, 0.4, 0.025, { rate: 0.12, depth: 0.02, target: 'gain' });
+      this.every(7, 14, () => {
+        const t = this.ctx.currentTime;
+        for (let k = 0; k < 3; k++) this.tone({ t: t + k * 0.42, type: 'triangle', f: 1180, d: 0.6, g: 0.012, dest: this.ambBus });
+      });
+    } else if (id === 'terraces') {
+      this.loopNoise('highpass', 1800, 0.3, 0.07);
+      this.loopNoise('lowpass', 420, 0.6, 0.05, { rate: 0.1, depth: 0.03, target: 'gain' });
+      // frogs in the paddies
+      this.every(2.5, 6, () => {
+        const t = this.ctx.currentTime;
+        for (let k = 0; k < 2 + Math.floor(Math.random() * 3); k++) this.tone({ t: t + k * 0.16, type: 'square', f: 220 + Math.random() * 60, f2: 180, d: 0.06, g: 0.012, dest: this.ambBus });
+      });
+    } else if (id === 'ruins') {
+      this.loopNoise('bandpass', 4200, 3, 0.03, { rate: 0.3, depth: 1200, target: 'freq' });
+      this.loopNoise('lowpass', 380, 0.5, 0.04);
+      this.every(1.4, 4, () => this.bird());
+      this.every(9, 16, () => this.tone({ f: 900, f2: 1400, a: 0.08, d: 0.5, g: 0.02, dest: this.ambBus }));
+    } else if (id === 'canals') {
+      this.loopNoise('lowpass', 380, 0.7, 0.06, { rate: 0.18, depth: 0.04, target: 'gain' });
+      this.loopNoise('bandpass', 1100, 0.6, 0.015, { rate: 0.05, depth: 300, target: 'freq' });
+      this.every(9, 18, () => {
+        const t = this.ctx.currentTime;
+        for (let k = 0; k < 4; k++) this.tone({ t: t + k * 0.7, f: [523, 659, 587, 392][k], d: 2.4, g: 0.012, dest: this.ambBus });
+      });
+    } else if (id === 'savanna') {
+      // dusk insects and a low, warm wind
+      this.loopNoise('bandpass', 5200, 8, 0.03, { rate: 6, depth: 0.02, target: 'gain' });
+      this.loopNoise('lowpass', 300, 0.5, 0.05, { rate: 0.06, depth: 120, target: 'freq' });
+      this.every(5, 11, () => this.bird());
+    } else if (id === 'lanterns') {
+      // the crowd along the river, and fireworks thudding far off
+      this.loopNoise('bandpass', 700, 0.8, 0.05, { rate: 0.2, depth: 200, target: 'freq' });
+      this.loopNoise('lowpass', 260, 0.6, 0.05, { rate: 0.12, depth: 0.03, target: 'gain' });
+      this.every(2.6, 5, () => {
+        const t = this.ctx.currentTime;
+        this.noiseHit({ t, type: 'lowpass', f: 160, q: 0.7, d: 0.5, g: 0.09, dest: this.ambBus, pan: Math.random() * 1.2 - 0.6 });
+        this.noiseHit({ t: t + 0.05, type: 'highpass', f: 3000, q: 0.5, d: 0.9, g: 0.012, dest: this.ambBus });
+      });
     }
     this.startMusic(stage.music);
   }

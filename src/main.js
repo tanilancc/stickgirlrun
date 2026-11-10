@@ -1,6 +1,6 @@
 // App controller: game loop, screens, attract mode, audio wiring.
 
-import { STAGES, CHARACTERS } from './stages.js';
+import { STAGES, CHAPTERS, CHARACTERS } from './stages.js';
 import { DT, DIFFICULTY, GROUND_Y } from './config.js';
 import { World } from './game.js';
 import { Renderer } from './renderer.js';
@@ -24,6 +24,9 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 
 /** Pseudo stage index for the endless road on the map. */
 const ENDLESS = STAGES.length;
+const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
+const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
 const app = {
   screen: 'title',
@@ -185,7 +188,7 @@ function makeEndlessThumb() {
   c.height = 300;
   const g = c.getContext('2d');
   const n = STAGES.length;
-  const slant = 46;
+  const slant = Math.min(46, (480 / n) * 0.6);
   for (let k = 0; k < n; k++) {
     const x0 = (k * 480) / n;
     const x1 = ((k + 1) * 480) / n;
@@ -222,12 +225,21 @@ function openMap() {
   const canvases = [];
   STAGES.forEach((st, i) => {
     const locked = i + 1 > prog.unlocked;
+    const ch = CHAPTERS.find((c) => c.from === i);
+    if (ch) {
+      const n = CHAPTERS.indexOf(ch);
+      const open = i < prog.unlocked;
+      const head = document.createElement('li');
+      head.className = 'chapter';
+      head.innerHTML = `<span class="ch-no">Chapter ${NUM_WORDS[n + 1]}</span><span class="ch-name">${ch.name}</span><span class="ch-sub">${open ? ch.subtitle : `Opens after ${STAGES[ch.from - 1].name}`}</span>`;
+      route.appendChild(head);
+    }
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'card';
     b.disabled = locked;
-    b.style.setProperty('--tilt', `${[-1.6, 1.1, -0.7, 1.5, -1.2, 0.8][i]}deg`);
+    b.style.setProperty('--tilt', `${[-1.6, 1.1, -0.7, 1.5, -1.2, 0.8][i % 6]}deg`);
     const stars = prog.stars[i] || 0;
     b.innerHTML = `<canvas width="480" height="300"></canvas><span class="no">${String(i + 1).padStart(2, '0')}</span>${locked ? '<span class="lock">Locked</span>' : ''}<span class="name">${st.name}</span><span class="meta"><span class="time">${st.time}</span><span class="stars">${[0, 1, 2].map((k) => STAR(k < stars)).join('')}</span></span>`;
     b.setAttribute('aria-label', `Stage ${i + 1}, ${st.name}${locked ? ', locked' : `, ${stars} of 3 stars`}`);
@@ -250,7 +262,7 @@ function openMap() {
     b.className = 'card';
     b.disabled = !open;
     b.style.setProperty('--tilt', '-0.9deg');
-    b.innerHTML = `<canvas width="480" height="300"></canvas><span class="no">∞</span>${open ? '' : '<span class="lock">Finish stage 6 to open</span>'}<span class="name">The Long Way Round</span><span class="meta"><span class="time">Endless · all six, again and again</span><span class="best">${best ? `best ${fmtNum(best)} m` : open ? 'no run yet' : ''}</span></span>`;
+    b.innerHTML = `<canvas width="480" height="300"></canvas><span class="no">∞</span>${open ? '' : '<span class="lock">Finish stage 6 to open</span>'}<span class="name">The Long Way Round</span><span class="meta"><span class="time">Endless · all ${NUM_WORDS[STAGES.length]}, again and again</span><span class="best">${best ? `best ${fmtNum(best)} m` : open ? 'no run yet' : ''}</span></span>`;
     b.setAttribute('aria-label', `Endless mode, the long way round${open ? (best ? `, best ${best} metres` : '') : ', locked until stage 6 is finished'}`);
     b.addEventListener('click', () => {
       audio.unlock();
@@ -311,7 +323,7 @@ function startStage(i) {
     input.enabled = true;
     showScreen('play');
     hudInit(w);
-    if (endless) showCaption(null, 0, 'Endless · the long way round', 'No finish line this time. Six places, round and round. How far can you get?');
+    if (endless) showCaption(null, 0, 'Endless · the long way round', `No finish line this time. ${NUM_WORDS[STAGES.length][0].toUpperCase() + NUM_WORDS[STAGES.length].slice(1)} places, round and round. How far can you get?`);
     else showCaption(w.stage, i);
     showTouchHints(mode);
     audio.unlock();
@@ -424,7 +436,7 @@ function onWorldEvent(type, data) {
     case 'done':
       setTimeout(() => {
         if (app.world === w) showResults();
-      }, w.stageIndex === STAGES.length - 1 ? 1600 : 900);
+      }, endsChapter(w.stageIndex) ? 1600 : 900);
       break;
     case 'failed':
       audio.fail();
@@ -464,8 +476,8 @@ function showResults() {
   const i = w.stageIndex;
   const diff = store.settings.diff;
   recordResult(store, diff, i, s.stars, s.coins);
-  if (i === STAGES.length - 1) {
-    showEnding(s);
+  if (endsChapter(i)) {
+    showEnding(s, chapterOf(i));
     return;
   }
   const next = STAGES[i + 1];
@@ -544,15 +556,41 @@ function showEndlessResults() {
   if (!isTouch) btns.querySelector('button').focus({ preventScroll: true });
 }
 
-function showEnding(s) {
+const ENDINGS = [
+  {
+    eyebrow: 'Stage six · Frozen Pass',
+    title: 'Home.',
+    text: (who) => `${who('kick', 'kicks')} the snow off at the cabin door. The kettle is already on. Six places, one long day, and the light in the window was worth every step.`,
+    note: 'A postcard is waiting on the mat: chapter two is open. And the long way round is endless now.',
+  },
+  {
+    eyebrow: 'Stage twelve · Lantern Festival',
+    title: 'Worth the trip.',
+    text: (who) => `${who('find', 'finds')} the spot by the river that somebody kept, just as the first fireworks go up. Sand, rain, ruins, canals, that enormous sun and now the lanterns: six postcards, and every one of them worth the run.`,
+    note: 'That is every stage. The long way round still goes on and on, through all twelve places.',
+  },
+];
+
+function showEnding(s, chapter = 0) {
   const diff = store.settings.diff;
   const total = store.progress[diff].stars.reduce((a, b) => a + b, 0);
   const who = store.settings.runner;
-  const names = who === 'duo' ? 'Mila and Arlo kick' : `${CHARACTERS[who].name} kicks`;
-  $('end-text').textContent = `${names} the snow off at the cabin door. The kettle is already on. Six places, one long day, and the light in the window was worth every step.`;
-  $('end-stats').innerHTML = `<div><dt>Stars</dt><dd>${total}/18</dd></div><div><dt>Coins this run</dt><dd>${s.coins}</dd></div><div><dt>Played on</dt><dd style="font-size:20px">${DIFFICULTY[diff].label}</dd></div>`;
+  const e = ENDINGS[chapter] || ENDINGS[0];
+  const subject = (plural, single) => (who === 'duo' ? `Mila and Arlo ${plural}` : `${CHARACTERS[who].name} ${single}`);
+  $('end-eyebrow').textContent = e.eyebrow;
+  $('end-title').textContent = e.title;
+  $('end-text').textContent = e.text(subject);
+  $('end-note').textContent = e.note;
+  $('end-stats').innerHTML = `<div><dt>Stars</dt><dd>${total}/${STAGES.length * 3}</dd></div><div><dt>Coins this run</dt><dd>${s.coins}</dd></div><div><dt>Played on</dt><dd style="font-size:20px">${DIFFICULTY[diff].label}</dd></div>`;
+  const next = CHAPTERS[chapter + 1];
+  const nextBtn = $('btn-end-next');
+  nextBtn.hidden = !next;
+  if (next) nextBtn.innerHTML = `Chapter ${NUM_WORDS[chapter + 2]}: ${next.name} <span aria-hidden="true">→</span>`;
+  $('btn-end-endless').className = next ? 'btn-light' : 'cta';
+  $('btn-end-endless').innerHTML = next ? 'Keep running, endless' : 'Keep running <span aria-hidden="true">→</span>';
   input.enabled = false;
   showScreen('ending');
+  if (!isTouch) (next ? nextBtn : $('btn-end-endless')).focus({ preventScroll: true });
 }
 
 function backToMap() {
@@ -595,6 +633,11 @@ $('btn-sound-title').addEventListener('click', () => {
   toggleMute();
 });
 $('btn-end-map').addEventListener('click', backToMap);
+$('btn-end-next').addEventListener('click', () => {
+  audio.click();
+  const ch = CHAPTERS[chapterOf(app.world ? app.world.stageIndex : 0) + 1];
+  startStage(ch ? ch.from : 0);
+});
 $('btn-end-endless').addEventListener('click', () => {
   audio.click();
   startStage(ENDLESS);

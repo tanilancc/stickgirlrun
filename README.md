@@ -2,8 +2,10 @@
 
 A hand-crafted stick-figure running game for the browser. **Mila** (stick girl) and **Arlo**
 (stick boy) have one day to get home across six stages, from a sunrise meadow to a frozen
-mountain pass at dawn. Then the long way round opens: an endless road through all six. It plays on desktop (keyboard or gamepad) and on phones (touch). One or
-two players can play, in a gentle **Kids** mode or a faster **Teen / Adult** mode.
+mountain pass at dawn. Then a postcard arrives, and chapter two takes them round the world in six
+more. The long way round is an endless road through all twelve. It plays on desktop (keyboard or
+gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
+faster **Teen / Adult** mode.
 
 ![Title screen](docs/screenshots/title.jpg)
 
@@ -32,7 +34,7 @@ pass on `main`, it publishes only the playable files (`index.html`, `css/`, `src
 Pages. All paths are relative, so the game works from the `/stickgirlrun/` sub-path. It needs a
 one-time setting: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-## The six stages
+## Chapter one: The Long Run Home
 
 | # | Stage | Time of day | What gets in your way |
 |---|-------|-------------|-----------------------|
@@ -43,14 +45,38 @@ one-time setting: **Settings → Pages → Build and deployment → Source: GitH
 | 5 | Harbor Storm | night, rain and lightning | crates, swinging cargo hooks, barrels, open water |
 | 6 | Frozen Pass | night into dawn | crevasses, falling icicles, snowballs, then the cabin |
 
+## Chapter two: Postcards from Away
+
+Clearing the Frozen Pass opens a second chapter on the map: six places round the world, each with
+its own ground, props, weather, ambience and musical mode.
+
+| # | Stage | Time of day | What gets in your way |
+|---|-------|-------------|-----------------------|
+| 7 | Sand Sea | morning | clay pots, market awnings, ruined walls, sand pits, rolling urns |
+| 8 | Monsoon Terraces | warm rain at noon | rice sheaves, bamboo fences and racks, straw stacks, the drop to the next paddy |
+| 9 | Jungle Ruins | humid afternoon | fallen columns, carved doorways, fig roots, swinging stones, rolling stone wheels |
+| 10 | Canal City | golden hour | planters, benches, café awnings, wellheads, canals between the quays, swinging lamps |
+| 11 | Savanna | sunset | thorn scrub, acacia limbs, termite mounds, rolling boulders |
+| 12 | Lantern Festival | night | drums, gift boxes, lantern strings, food stalls, big swinging lanterns, then the river |
+
+| | |
+|---|---|
+| ![Sand Sea](docs/screenshots/sand-sea.jpg) | ![Monsoon Terraces](docs/screenshots/monsoon-terraces.jpg) |
+| ![Jungle Ruins](docs/screenshots/jungle-ruins.jpg) | ![Canal City](docs/screenshots/canal-city.jpg) |
+| ![Savanna](docs/screenshots/savanna.jpg) | ![Lantern Festival](docs/screenshots/lantern-festival.jpg) |
+
+The trip ends by the river with fireworks, at a spot somebody saved:
+
+![Worth the trip](docs/screenshots/worth-the-trip.jpg)
+
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
 
 ## Endless: The Long Way Round
 
-Clearing stage 6 opens a seventh postcard on the map, and a **Keep running** button on the
-ending screen. It is one unbroken road through all six landscapes, in order, over and over:
+Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
+ending screens. It is one unbroken road through all twelve landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -101,7 +127,7 @@ of the screen is Mila and the right half is Arlo (top = jump, bottom = slide). T
   lit by slope, and separated by drifting fog. Far layers are painted at lower resolution so they
   soften naturally.
 - **Light and weather.** Sun glow, god rays, lamp light, lightning, an aurora, lit windows,
-  pollen, leaves, sand, rain and snow. A final pass adds grading, a vignette and film grain.
+  fireworks, pollen, leaves, sand, rain, warm drizzle, butterflies, sky lanterns and snow. A final pass adds grading, a vignette and film grain.
 - **Sound.** Everything is synthesized with Web Audio: footsteps per surface, birdsong, wind,
   rain, surf, thunder, and a quiet plucked-string score (Karplus–Strong) in a generated room
   reverb. There are no audio files.
@@ -115,7 +141,8 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all six landscapes, keeps every gap jumpable and keeps memory flat. The autopilot does not know the level:
+all twelve landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
 
@@ -128,7 +155,8 @@ npm test
 ```
 index.html, css/style.css   screens, HUD and styling
 src/config.js               physics + difficulty constants, jump math
-src/stages.js               the six stages: palettes, hazards, weather, music
+src/stages.js               chapter one + chapters: palettes, hazards, weather, music
+src/stages-world.js         chapter two, round the world
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
@@ -136,7 +164,9 @@ src/endless.js              endless road: streams + prunes the level, landscape 
 src/game.js                 World: speed, scoring, hearts, rescue, finish
 src/figure.js               skeleton, IK, poses, hair/scarf, drawing
 src/backgrounds.js          procedural parallax layers, sky, sun, aurora
+src/backgrounds-world.js    chapter two landscapes, fireworks
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
+src/art-world.js            chapter two ground, props, movers, decor, pavilion
 src/fx.js                   particles, weather, grade/vignette/grain
 src/renderer.js             camera + frame composition
 src/audio.js                synthesized sound and music

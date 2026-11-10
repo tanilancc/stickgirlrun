@@ -3,7 +3,8 @@
 A hand-crafted stick-figure running game for the browser. **Mila** (stick girl) and **Arlo**
 (stick boy) have one day to get home across six stages, from a sunrise meadow to a frozen
 mountain pass at dawn. Then a postcard arrives, and chapter two takes them round the world in six
-more. The long way round is an endless road through all twelve. It plays on desktop (keyboard or
+more. Chapter three climbs through six wild places to a summit under falling stars. The long way
+round is an endless road through all eighteen. It plays on desktop (keyboard or
 gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
 faster **Teen / Adult** mode.
 
@@ -69,6 +70,31 @@ The trip ends by the river with fireworks, at a spot somebody saved:
 
 ![Worth the trip](docs/screenshots/worth-the-trip.jpg)
 
+## Chapter three: Under Open Skies
+
+Clearing the Lantern Festival opens the third chapter: six wild places, from spring blossom to a
+mountain top at night.
+
+| # | Stage | Time of day | What gets in your way |
+|---|-------|-------------|-----------------------|
+| 13 | Blossom Orchard | spring morning | beehives, wheelbarrows of apples, blossom boughs, hay carts, rolling cart wheels |
+| 14 | Lavender Fields | summer noon | lavender bundles, dry-stone walls, vine arbours, lavender carts, rolling cheese wheels |
+| 15 | Fire Island | smoky afternoon | basalt and pumice, rock arches, basalt columns, lava pits, rolling lava bombs, glowing rocks falling from overhangs |
+| 16 | Cloud Forest | misty morning | mossy logs, tree ferns, moss-bearded trunks, giant stumps, drops into the cloud, swinging stones |
+| 17 | Maple Gorge | autumn afternoon | pumpkins, maple limbs, log piles, a river gorge, rolling pumpkins |
+| 18 | Starlight Summit | clear night | cairns, fairy-light strings, crevasses, rolling boulders, then the observatory |
+
+| | |
+|---|---|
+| ![Blossom Orchard](docs/screenshots/blossom-orchard.jpg) | ![Lavender Fields](docs/screenshots/lavender-fields.jpg) |
+| ![Fire Island](docs/screenshots/fire-island.jpg) | ![Cloud Forest](docs/screenshots/cloud-forest.jpg) |
+| ![Maple Gorge](docs/screenshots/maple-gorge.jpg) | ![Starlight Summit](docs/screenshots/starlight-summit.jpg) |
+
+The summit has the Milky Way overhead and a meteor shower that builds as you reach the
+observatory, where someone has the telescope out:
+
+![The top of the world](docs/screenshots/top-of-the-world.jpg)
+
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
@@ -96,7 +122,7 @@ pair first, then random pairs from the cast.
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
-ending screens. It is one unbroken road through all twelve landscapes, in order, over and over:
+ending screens. It is one unbroken road through all eighteen landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -147,7 +173,8 @@ of the screen is Mila and the right half is Arlo (top = jump, bottom = slide). T
   lit by slope, and separated by drifting fog. Far layers are painted at lower resolution so they
   soften naturally.
 - **Light and weather.** Sun glow, god rays, lamp light, lightning, an aurora, lit windows,
-  fireworks, pollen, leaves, sand, rain, warm drizzle, butterflies, sky lanterns and snow. A final pass adds grading, a vignette and film grain.
+  fireworks, the Milky Way, shooting stars, lava glow, pollen, leaves, blossom petals, sand,
+  volcanic ash and embers, rain, warm drizzle, drifting mist, butterflies, sky lanterns and snow. A final pass adds grading, a vignette and film grain.
 - **Sound.** Everything is synthesized with Web Audio: footsteps per surface, birdsong, wind,
   rain, surf, thunder, and a quiet plucked-string score (Karplus–Strong) in a generated room
   reverb. There are no audio files.
@@ -161,7 +188,7 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all twelve landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+all eighteen landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
 also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
@@ -177,6 +204,7 @@ index.html, css/style.css   screens, HUD and styling
 src/config.js               physics + difficulty constants, jump math
 src/stages.js               chapter one + chapters: palettes, hazards, weather, music
 src/stages-world.js         chapter two, round the world
+src/stages-skies.js         chapter three, under open skies
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
@@ -186,8 +214,10 @@ src/cast.js                 who can run: Mila, Arlo and the portrait cast
 src/figure.js               skeleton, IK, poses, hair/scarf, cast faces and clothes, drawing
 src/backgrounds.js          procedural parallax layers, sky, sun, aurora
 src/backgrounds-world.js    chapter two landscapes, fireworks
+src/backgrounds-skies.js    chapter three landscapes, Milky Way, meteors
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
 src/art-world.js            chapter two ground, props, movers, decor, pavilion
+src/art-skies.js            chapter three ground, props, movers, decor, observatory
 src/fx.js                   particles, weather, grade/vignette/grain
 src/renderer.js             camera + frame composition
 src/audio.js                synthesized sound and music

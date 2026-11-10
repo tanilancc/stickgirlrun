@@ -5,6 +5,7 @@
 
 import { mulberry32, hash } from './rng.js';
 import { WORLD_THEMES, drawFireworks } from './backgrounds-world.js';
+import { SKY_THEMES, drawMeteors } from './backgrounds-skies.js';
 import { clamp, mix, alpha, TAU, fract } from './util.js';
 
 export const TW = 2048;
@@ -966,7 +967,7 @@ export function buildBackground(stage) {
   const rng = mulberry32(stage.seed * 31 + 5);
   const P = stage.palette;
   // looked up at call time so the import cycle with backgrounds-world.js is harmless
-  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain])(P, rng);
+  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain] || SKY_THEMES[stage.terrain])(P, rng);
   if (theme.fogAfter) {
     for (const k of Object.keys(theme.fogAfter)) theme.fogAfter[k].tile = fogTile(theme.fogAfter[k].color, stage.terrain === 'forest' ? 1.4 : 1);
   }
@@ -1009,6 +1010,9 @@ export function drawBackground(ctx, bg, view, cam, t, progress, flash) {
     drawTile(ctx, bg.starTile, (cam.x * 0.01) % TW, view.top - cam.y * 0.01, TW, 380, view.w);
     ctx.globalAlpha = 1;
   }
+  if (bg.milkyTile) drawTile(ctx, bg.milkyTile, (cam.x * 0.008) % TW, view.top - cam.y * 0.008, TW, 380, view.w);
+  // shooting stars: a few all night, then a shower at the top
+  if (bg.meteors) drawMeteors(ctx, view, t, clamp((progress - 0.88) / 0.12, 0, 1));
   if (bg.aurora && night > 0.02) drawAurora(ctx, view, t, night * 0.9);
 
   // sun / moon
@@ -1174,6 +1178,28 @@ function drawDyn(ctx, d, x, y, t, P) {
     ctx.lineTo(x - 26, y + 72);
     ctx.fill();
     ctx.restore();
+  } else if (d.type === 'glow') {
+    // a slow, breathing glow (lava in a crater)
+    const k = 0.75 + 0.25 * Math.sin((t / d.period) * TAU);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const g = ctx.createRadialGradient(x, y, 0, x, y, d.r);
+    g.addColorStop(0, alpha(d.color, 0.55 * k));
+    g.addColorStop(0.4, alpha(d.color, 0.18 * k));
+    g.addColorStop(1, alpha(d.color, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(x - d.r, y - d.r, d.r * 2, d.r * 2);
+    ctx.restore();
+  } else if (d.type === 'steam') {
+    // a vent breathing out puffs that rise, swell and fade
+    for (let k = 0; k < 5; k++) {
+      const p = fract(t * 0.18 + k / 5 + d.phase);
+      const r = (6 + p * 26) * d.s;
+      ctx.fillStyle = `rgba(220,214,214,${0.2 * (1 - p)})`;
+      ctx.beginPath();
+      ctx.arc(x + p * 18 * d.s + Math.sin(p * 5 + k) * 3, y - p * 90 * d.s, r, 0, TAU);
+      ctx.fill();
+    }
   } else if (d.type === 'paperLantern') {
     const s = d.s;
     const sway = Math.sin(t * 1.3 + d.phase) * 0.12;

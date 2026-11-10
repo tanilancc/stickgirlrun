@@ -68,6 +68,30 @@ export const SKINS = {
   cafeAwning: { kind: 'over', w: [100, 160], h: [34, 46] },
   acacia: { kind: 'over', w: [100, 160], h: [40, 56] },
   lanternString: { kind: 'over', w: [110, 190], h: [30, 40] },
+
+  // ---- chapter 3: under open skies
+  beehive: { kind: 'solid', w: [46, 58], h: [40, 48] },
+  wheelbarrow: { kind: 'solid', w: [70, 92], h: [34, 42] },
+  lavBundle: { kind: 'solid', w: [54, 70], h: [34, 42] },
+  stoneWall: { kind: 'solid', w: [80, 120], h: [32, 40] },
+  basalt: { kind: 'solid', w: [50, 74], h: [30, 42] },
+  pumice: { kind: 'solid', w: [44, 60], h: [32, 40] },
+  mossLog: { kind: 'solid', w: [90, 130], h: [32, 40] },
+  fernClump: { kind: 'hazard', w: [52, 70], h: [38, 46] },
+  pumpkins: { kind: 'solid', w: [56, 76], h: [34, 44] },
+  cairn: { kind: 'solid', w: [40, 54], h: [40, 50] },
+  cart: { kind: 'solid', w: [120, 170], h: [78, 92] },
+  lavCart: { kind: 'solid', w: [120, 160], h: [78, 92] },
+  basaltColumns: { kind: 'solid', w: [100, 160], h: [78, 94] },
+  giantStump: { kind: 'solid', w: [100, 140], h: [78, 94] },
+  logPile: { kind: 'solid', w: [110, 160], h: [76, 90] },
+  bigCairn: { kind: 'solid', w: [90, 130], h: [78, 92] },
+  blossomBranch: { kind: 'over', w: [90, 140], h: [44, 58] },
+  grapeArbor: { kind: 'over', w: [100, 160], h: [34, 44] },
+  lavaArch: { kind: 'over', w: [90, 140], h: [38, 50] },
+  hangingMoss: { kind: 'over', w: [90, 140], h: [40, 54] },
+  mapleBranch: { kind: 'over', w: [90, 140], h: [44, 58] },
+  starRope: { kind: 'over', w: [110, 180], h: [28, 38] },
 };
 
 export const stageLength = (stage, diff) => Math.round(stage.length * diff.lengthMul);
@@ -333,7 +357,7 @@ def('icicles', { minTier: 0.8, moving: true }, (c) => {
   const D = speed * (JUMP.air + lerp(0.42, 0.22, c.tier / 3));
   let x = b.x + speed * 0.9;
   for (let i = 0; i < n; i++) {
-    c.L.movers.push({ type: 'icicle', x, y0: b.y - 290, ground: b.y, w: 16, h: 42, fallD: x - 640, vNom: speed, cx: x, seed: (rng() * 1e9) | 0 });
+    c.L.movers.push({ type: 'icicle', skin: c.stage.skins.drop || 'icicle', x, y0: b.y - 290, ground: b.y, w: 16, h: 42, fallD: x - 640, vNom: speed, cx: x, seed: (rng() * 1e9) | 0 });
     b.coinArc(x - (speed * JUMP.air) / 2, b.y, speed, 4);
     x += D;
   }

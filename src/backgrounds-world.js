@@ -127,7 +127,7 @@ function ziggurat(g, cx, base, w, h, col, tiers) {
   g.fillRect(cx - w * 0.02, base - th * tiers, w * 0.04, th * tiers);
 }
 
-function blobCanopy(g, x, y, r, col, rng, n = 7) {
+export function blobCanopy(g, x, y, r, col, rng, n = 7) {
   g.fillStyle = col;
   for (let i = 0; i < n; i++) {
     g.beginPath();
@@ -136,7 +136,7 @@ function blobCanopy(g, x, y, r, col, rng, n = 7) {
   }
 }
 
-function emergentTree(g, x, base, h, col, rng) {
+export function emergentTree(g, x, base, h, col, rng) {
   g.strokeStyle = col;
   g.lineWidth = Math.max(2, h * 0.04);
   g.beginPath();
@@ -146,7 +146,7 @@ function emergentTree(g, x, base, h, col, rng) {
   blobCanopy(g, x, base - h * 0.85, h * 0.2, col, rng, 9);
 }
 
-function bigLeaf(g, x, y, s, ang, col, rib) {
+export function bigLeaf(g, x, y, s, ang, col, rib) {
   g.save();
   g.translate(x, y);
   g.rotate(ang);
@@ -167,7 +167,7 @@ function bigLeaf(g, x, y, s, ang, col, rib) {
   g.restore();
 }
 
-function campanile(g, x, base, w, h, col) {
+export function campanile(g, x, base, w, h, col) {
   g.fillStyle = col;
   g.fillRect(x, base - h, w, h);
   g.fillRect(x - 2, base - h - 3, w + 4, 3);
@@ -229,7 +229,7 @@ function rowHouse(g, x, base, w, h, col, rng, o) {
   }
 }
 
-function archBridge(g, x, base, w, rise, col) {
+export function archBridge(g, x, base, w, rise, col) {
   g.fillStyle = col;
   g.beginPath();
   g.moveTo(x - 10, base);

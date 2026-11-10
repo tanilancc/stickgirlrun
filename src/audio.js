@@ -10,6 +10,7 @@ const SCALES = {
   lydian: [0, 2, 4, 6, 7, 9, 11],
   hijaz: [0, 1, 4, 5, 7, 8, 10],
   mixolydian: [0, 2, 4, 5, 7, 9, 10],
+  phrygian: [0, 1, 3, 5, 7, 8, 10],
 };
 
 const STEP = {
@@ -21,6 +22,7 @@ const STEP = {
   snow: { f: 2600, q: 0.5, d: 0.13, g: 0.12 },
   mud: { f: 520, q: 0.8, d: 0.11, g: 0.15, thump: 80 },
   stone: { f: 1300, q: 1.6, d: 0.05, g: 0.13, thump: 150 },
+  gravel: { f: 2100, q: 0.8, d: 0.09, g: 0.13 },
 };
 
 const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
@@ -415,6 +417,39 @@ export class AudioEngine {
         const t = this.ctx.currentTime;
         this.noiseHit({ t, type: 'lowpass', f: 160, q: 0.7, d: 0.5, g: 0.09, dest: this.ambBus, pan: Math.random() * 1.2 - 0.6 });
         this.noiseHit({ t: t + 0.05, type: 'highpass', f: 3000, q: 0.5, d: 0.9, g: 0.012, dest: this.ambBus });
+      });
+    } else if (id === 'orchard') {
+      // birdsong in the blossom and the hum of the hives
+      this.loopNoise('lowpass', 520, 0.5, 0.04, { rate: 0.08, depth: 200, target: 'freq' });
+      this.loopNoise('bandpass', 220, 8, 0.02, { rate: 3, depth: 0.01, target: 'gain' });
+      this.every(1.2, 3.5, () => this.bird());
+    } else if (id === 'lavender') {
+      // cicadas in the heat
+      this.loopNoise('bandpass', 4600, 10, 0.035, { rate: 7, depth: 0.025, target: 'gain' });
+      this.loopNoise('lowpass', 400, 0.5, 0.03);
+      this.every(4, 9, () => this.bird());
+    } else if (id === 'volcano') {
+      // a deep rumble that never quite stops, and the hiss of vents
+      this.loopNoise('lowpass', 90, 0.8, 0.16, { rate: 0.09, depth: 0.08, target: 'gain' });
+      this.loopNoise('highpass', 3200, 0.4, 0.02, { rate: 0.2, depth: 0.015, target: 'gain' });
+      this.every(6, 12, () => this.noiseHit({ type: 'lowpass', f: 70, q: 0.6, d: 1.4, g: 0.12, dest: this.ambBus }));
+    } else if (id === 'cloudforest') {
+      // dripping leaves and strange birds in the cloud
+      this.loopNoise('bandpass', 1600, 0.6, 0.03, { rate: 0.1, depth: 500, target: 'freq' });
+      this.every(0.8, 2.4, () => this.tone({ f: 1800 + Math.random() * 1400, f2: 900, d: 0.05, g: 0.018, dest: this.ambBus }));
+      this.every(5, 10, () => this.tone({ f: 600, f2: 1200, a: 0.1, d: 0.6, g: 0.02, dest: this.ambBus }));
+    } else if (id === 'maple') {
+      // a waterfall somewhere below, and leaves skittering
+      this.loopNoise('bandpass', 900, 0.7, 0.06, { rate: 0.12, depth: 150, target: 'freq' });
+      this.loopNoise('highpass', 2600, 0.5, 0.02, { rate: 0.3, depth: 0.012, target: 'gain' });
+      this.every(3, 7, () => this.bird());
+    } else if (id === 'summit') {
+      // thin cold wind, and the quiet of a very big sky
+      this.loopNoise('bandpass', 700, 3, 0.05, { rate: 0.05, depth: 300, target: 'freq' });
+      this.every(9, 16, () => {
+        const t = this.ctx.currentTime;
+        this.tone({ t, f: 1568, d: 2.6, g: 0.008, dest: this.ambBus });
+        this.tone({ t: t + 0.4, f: 2093, d: 2.2, g: 0.006, dest: this.ambBus });
       });
     }
     this.startMusic(stage.music);

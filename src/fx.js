@@ -189,7 +189,7 @@ export class Weather {
     this.birdT = 3 + Math.random() * 4;
     this.tumble = null;
     this.tumbleT = 6;
-    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190, drizzle: 150, butterflies: 9, lanterns: 26 };
+    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190, drizzle: 150, butterflies: 9, lanterns: 26, petals: 34, ash: 110, mist: 9 };
     const n = counts[this.kind] || 0;
     for (let i = 0; i < n; i++) this.items.push(this.spawn(true));
   }
@@ -198,6 +198,12 @@ export class Weather {
     const z = 0.3 + Math.random() * 0.7;
     const o = { x: Math.random() * (view.w + 100) - 50, y: anywhere ? lerp(view.top, view.bottom, Math.random()) : view.top - 20, z, ph: Math.random() * TAU, rot: Math.random() * TAU };
     if (this.kind === 'leaves') o.col = this.P.leaves[Math.floor(Math.random() * this.P.leaves.length)];
+    if (this.kind === 'petals') o.col = this.P.petals[Math.floor(Math.random() * this.P.petals.length)];
+    if (this.kind === 'ash') o.ember = Math.random() < 0.18;
+    if (this.kind === 'mist') {
+      o.y = lerp(250, 470, Math.random());
+      o.r = 80 + Math.random() * 120;
+    }
     if (this.kind === 'sand') o.y = lerp(view.top + 40, view.bottom, Math.random());
     if (this.kind === 'pollen' || this.kind === 'dusk') o.y = lerp(250, 430, Math.random());
     if (this.kind === 'butterflies') {
@@ -232,6 +238,20 @@ export class Weather {
       } else if (k === 'rain') {
         o.y += (950 + 450 * o.z) * dt;
         o.x -= 200 * o.z * dt;
+      } else if (k === 'petals') {
+        o.y += (22 + 26 * o.z) * dt;
+        o.x += (Math.sin(t * 1.1 + o.ph) * 36 - 40) * dt;
+        o.rot += dt * (1.2 + o.z * 2.4);
+      } else if (k === 'ash') {
+        if (o.ember) {
+          o.y -= (30 + 40 * o.z) * dt;
+          o.x += Math.sin(t * 2 + o.ph) * 20 * dt;
+        } else {
+          o.y += (26 + 30 * o.z) * dt;
+          o.x += (Math.sin(t * 0.8 + o.ph) * 14 - 20) * dt;
+        }
+      } else if (k === 'mist') {
+        o.x -= (12 + 10 * o.z) * dt;
       } else if (k === 'drizzle') {
         o.y += (520 + 260 * o.z) * dt;
         o.x -= 70 * o.z * dt;
@@ -251,10 +271,12 @@ export class Weather {
       if (o.y > view.bottom + 20) {
         Object.assign(o, this.spawn(false, view));
       }
-      if (o.x < -60) o.x += view.w + 120;
-      if (o.x > view.w + 60) o.x -= view.w + 120;
+      const wrap = k === 'mist' ? o.r : 60; // big mist banks wrap only once fully off screen
+      if (o.x < -wrap) o.x += view.w + wrap * 2;
+      if (o.x > view.w + wrap) o.x -= view.w + wrap * 2;
       if (o.y < view.top - 40) {
         if (k === 'lanterns') Object.assign(o, this.spawn(false, view));
+        else if (k === 'ash' && o.ember) o.y = view.bottom + 10;
         else o.y = view.bottom;
       }
     }
@@ -369,6 +391,38 @@ export class Weather {
         }
         ctx.stroke();
       }
+    } else if (k === 'petals') {
+      for (const o of this.items) {
+        ctx.save();
+        ctx.translate(o.x, o.y);
+        ctx.rotate(o.rot);
+        ctx.scale(Math.cos(o.rot * 1.6), 1);
+        ctx.fillStyle = alpha(o.col, 0.6 + o.z * 0.35);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 1.8 + o.z * 2.4, 1.2 + o.z * 1.2, 0, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+    } else if (k === 'ash') {
+      for (const o of this.items) {
+        if (o.ember) {
+          const f = 0.6 + 0.4 * Math.sin(t * 9 + o.ph);
+          ctx.fillStyle = alpha('#ffa040', (0.4 + 0.5 * o.z) * f);
+          ctx.fillRect(o.x, o.y, 1.2 + o.z * 1.4, 1.2 + o.z * 1.4);
+        } else {
+          ctx.fillStyle = alpha('#c8c0bc', 0.25 + o.z * 0.35);
+          ctx.fillRect(o.x, o.y, 1 + o.z * 1.8, 1 + o.z * 1.2);
+        }
+      }
+    } else if (k === 'mist') {
+      for (const o of this.items) {
+        const y = o.y - camY * 0.2;
+        const g = ctx.createRadialGradient(o.x, y, 0, o.x, y, o.r);
+        g.addColorStop(0, alpha(P.haze, 0.16 * (0.6 + o.z * 0.4)));
+        g.addColorStop(1, alpha(P.haze, 0));
+        ctx.fillStyle = g;
+        ctx.fillRect(o.x - o.r, y - o.r, o.r * 2, o.r * 2);
+      }
     } else if (k === 'drizzle') {
       ctx.lineWidth = 1;
       for (let layer = 0; layer < 2; layer++) {
@@ -472,6 +526,9 @@ export class Post {
     } else if (stage.id === 'canals') {
       tod = progress * 0.1;
       todCol = '#2a1430';
+    } else if (stage.id === 'maple') {
+      tod = progress * 0.12;
+      todCol = '#3a1420';
     }
     if (tod > 0.003) {
       ctx.fillStyle = alpha(todCol, tod);

@@ -1,4 +1,4 @@
-// Endless mode, "The Long Way Round": one unbroken road through all six landscapes in turn,
+// Endless mode, "The Long Way Round": one unbroken road through every landscape in turn,
 // generated a few seconds ahead of the runners and forgotten behind them, so memory stays
 // flat however far you get. It uses the same patterns, physics and fairness rules as the stages.
 

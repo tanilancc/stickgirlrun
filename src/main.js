@@ -27,7 +27,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 const ENDLESS = STAGES.length;
 const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
 const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
-const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four'];
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty'];
 
 const app = {
   screen: 'title',
@@ -615,7 +615,13 @@ const ENDINGS = [
     eyebrow: 'Stage twenty-four · Bonfire Point',
     title: 'Everyone, together.',
     text: (who) => `${who('run', 'runs')} the last stretch of sand to the fire, where everybody is already waiting with a blanket and a spare marshmallow. The lighthouse goes round. Salt, sea, mangroves, caves, the village and now this. Twenty-four places, and every one of them led here.`,
-    note: 'That is every stage. The long way round still goes on and on, through all twenty-four places.',
+    note: 'One more postcard, in a hand you know: come home. Chapter five is open.',
+  },
+  {
+    eyebrow: 'Stage thirty · Home Again',
+    title: 'Home again.',
+    text: (who) => `${who('come', 'comes')} up the same path as the very first morning. The porch lights are on, the table is laid outside, and the door is open. Steam, bamboo, painted hills, tulips, the glacier, and home. Thirty places, and the best one was here all along.`,
+    note: 'That is every stage. The long way round still goes on and on, through all thirty places.',
   },
 ];
 

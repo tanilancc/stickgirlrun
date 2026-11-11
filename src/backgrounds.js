@@ -7,6 +7,7 @@ import { mulberry32, hash } from './rng.js';
 import { WORLD_THEMES, drawFireworks } from './backgrounds-world.js';
 import { SKY_THEMES, drawMeteors } from './backgrounds-skies.js';
 import { SEA_THEMES } from './backgrounds-sea.js';
+import { RETURN_THEMES } from './backgrounds-return.js';
 import { clamp, mix, alpha, TAU, fract } from './util.js';
 
 export const TW = 2048;
@@ -968,7 +969,7 @@ export function buildBackground(stage) {
   const rng = mulberry32(stage.seed * 31 + 5);
   const P = stage.palette;
   // looked up at call time so the import cycle with backgrounds-world.js is harmless
-  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain] || SKY_THEMES[stage.terrain] || SEA_THEMES[stage.terrain])(P, rng);
+  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain] || SKY_THEMES[stage.terrain] || SEA_THEMES[stage.terrain] || RETURN_THEMES[stage.terrain])(P, rng);
   if (theme.fogAfter) {
     for (const k of Object.keys(theme.fogAfter)) theme.fogAfter[k].tile = fogTile(theme.fogAfter[k].color, stage.terrain === 'forest' ? 1.4 : 1);
   }
@@ -1191,6 +1192,41 @@ function drawDyn(ctx, d, x, y, t, P) {
     ctx.fillStyle = g;
     ctx.fillRect(x - d.r, y - d.r, d.r * 2, d.r * 2);
     ctx.restore();
+  } else if (d.type === 'geyser') {
+    // quiet most of the time, then a column of water and steam for a few seconds
+    const p = fract(t / d.period + d.phase);
+    const k = p < 0.28 ? Math.sin((Math.PI * p) / 0.28) : 0;
+    if (k > 0.01) {
+      const h = d.h * k;
+      const g = ctx.createLinearGradient(0, y - h, 0, y);
+      g.addColorStop(0, 'rgba(255,255,255,0)');
+      g.addColorStop(0.3, `rgba(250,252,255,${0.7 * k})`);
+      g.addColorStop(1, `rgba(240,246,250,${0.9 * k})`);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(x - 4, y);
+      ctx.quadraticCurveTo(x - 6 - h * 0.05, y - h * 0.6, x - 10, y - h);
+      ctx.lineTo(x + 10, y - h);
+      ctx.quadraticCurveTo(x + 6 + h * 0.05, y - h * 0.6, x + 4, y);
+      ctx.fill();
+      for (let j = 0; j < 4; j++) {
+        const r = 14 + j * 8 + h * 0.15;
+        ctx.fillStyle = `rgba(240,244,248,${0.35 * k * (1 - j * 0.2)})`;
+        ctx.beginPath();
+        ctx.arc(x + Math.sin(t + j) * 6 + j * 6, y - h - j * 10, r, 0, TAU);
+        ctx.fill();
+      }
+    }
+    // the plume of steam that hangs on long after
+    const after = p < 0.6 ? Math.min(1, p / 0.28) * (1 - Math.max(0, (p - 0.28) / 0.32)) : 0;
+    if (after > 0.01) {
+      for (let j = 0; j < 5; j++) {
+        ctx.fillStyle = `rgba(230,234,238,${0.18 * after})`;
+        ctx.beginPath();
+        ctx.arc(x + j * 14 + p * 40, y - d.h * 0.8 - j * 12 - p * 60, 26 + j * 8, 0, TAU);
+        ctx.fill();
+      }
+    }
   } else if (d.type === 'steam') {
     // a vent breathing out puffs that rise, swell and fade
     for (let k = 0; k < 5; k++) {

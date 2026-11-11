@@ -3,6 +3,7 @@
 
 import { WORLD_STAGES } from './stages-world.js';
 import { SKY_STAGES } from './stages-skies.js';
+import { SEA_STAGES } from './stages-sea.js';
 
 const HOME_STAGES = [
   {
@@ -256,7 +257,7 @@ const HOME_STAGES = [
   },
 ];
 
-export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES];
+export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES, ...SEA_STAGES];
 
 /** Chapters group stages on the map; the last stage of each has its own ending. */
 export const CHAPTERS = [
@@ -267,6 +268,12 @@ export const CHAPTERS = [
     subtitle: 'Six wild places, and a night of falling stars',
     from: HOME_STAGES.length + WORLD_STAGES.length,
     to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length - 1,
+  },
+  {
+    name: 'Down to the Sea',
+    subtitle: 'Six shores, and a fire on the beach',
+    from: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length,
+    to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length - 1,
   },
 ];
 

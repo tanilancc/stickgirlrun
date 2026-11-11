@@ -189,7 +189,7 @@ export class Weather {
     this.birdT = 3 + Math.random() * 4;
     this.tumble = null;
     this.tumbleT = 6;
-    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190, drizzle: 150, butterflies: 9, lanterns: 26, petals: 34, ash: 110, mist: 9 };
+    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190, drizzle: 150, butterflies: 9, lanterns: 26, petals: 34, ash: 110, mist: 9, glowworms: 60, fireflies: 34 };
     const n = counts[this.kind] || 0;
     for (let i = 0; i < n; i++) this.items.push(this.spawn(true));
   }
@@ -200,6 +200,7 @@ export class Weather {
     if (this.kind === 'leaves') o.col = this.P.leaves[Math.floor(Math.random() * this.P.leaves.length)];
     if (this.kind === 'petals') o.col = this.P.petals[Math.floor(Math.random() * this.P.petals.length)];
     if (this.kind === 'ash') o.ember = Math.random() < 0.18;
+    if (this.kind === 'glowworms' || this.kind === 'fireflies') o.y = lerp(this.kind === 'glowworms' ? 40 : 280, this.kind === 'glowworms' ? 420 : 440, Math.random());
     if (this.kind === 'mist') {
       o.y = lerp(250, 470, Math.random());
       o.r = 80 + Math.random() * 120;
@@ -252,6 +253,10 @@ export class Weather {
         }
       } else if (k === 'mist') {
         o.x -= (12 + 10 * o.z) * dt;
+      } else if (k === 'glowworms' || k === 'fireflies') {
+        const sp = k === 'glowworms' ? 4 : 16;
+        o.x += Math.sin(t * 0.5 + o.ph) * sp * dt;
+        o.y += Math.cos(t * 0.4 + o.ph * 1.3) * sp * 0.6 * dt;
       } else if (k === 'drizzle') {
         o.y += (520 + 260 * o.z) * dt;
         o.x -= 70 * o.z * dt;
@@ -414,6 +419,23 @@ export class Weather {
           ctx.fillRect(o.x, o.y, 1 + o.z * 1.8, 1 + o.z * 1.2);
         }
       }
+    } else if (k === 'glowworms' || k === 'fireflies') {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const col = k === 'glowworms' ? P.lamp : '#e8f070';
+      for (const o of this.items) {
+        const blink = k === 'fireflies' ? Math.max(0, Math.sin(t * 1.7 + o.ph * 3)) : 0.55 + 0.45 * Math.sin(t * 0.9 + o.ph * 2);
+        if (blink < 0.05) continue;
+        const r = 1 + o.z * 1.6;
+        const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, r * 5);
+        g.addColorStop(0, alpha(col, 0.5 * blink * o.z));
+        g.addColorStop(1, alpha(col, 0));
+        ctx.fillStyle = g;
+        ctx.fillRect(o.x - r * 5, o.y - r * 5, r * 10, r * 10);
+        ctx.fillStyle = alpha(col, 0.9 * blink);
+        ctx.fillRect(o.x - r * 0.5, o.y - r * 0.5, r, r);
+      }
+      ctx.restore();
     } else if (k === 'mist') {
       for (const o of this.items) {
         const y = o.y - camY * 0.2;

@@ -6,6 +6,7 @@
 import { mulberry32, hash } from './rng.js';
 import { WORLD_THEMES, drawFireworks } from './backgrounds-world.js';
 import { SKY_THEMES, drawMeteors } from './backgrounds-skies.js';
+import { SEA_THEMES } from './backgrounds-sea.js';
 import { clamp, mix, alpha, TAU, fract } from './util.js';
 
 export const TW = 2048;
@@ -967,7 +968,7 @@ export function buildBackground(stage) {
   const rng = mulberry32(stage.seed * 31 + 5);
   const P = stage.palette;
   // looked up at call time so the import cycle with backgrounds-world.js is harmless
-  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain] || SKY_THEMES[stage.terrain])(P, rng);
+  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain] || SKY_THEMES[stage.terrain] || SEA_THEMES[stage.terrain])(P, rng);
   if (theme.fogAfter) {
     for (const k of Object.keys(theme.fogAfter)) theme.fogAfter[k].tile = fogTile(theme.fogAfter[k].color, stage.terrain === 'forest' ? 1.4 : 1);
   }

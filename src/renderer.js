@@ -15,6 +15,7 @@ const DUST = {
   meadow: '#cdb89a', forest: '#8a7a5a', canyon: '#e2b98a', roof: '#a89a90', harbor: '#aac4dc', snow: '#ffffff',
   dunes: '#ecd2a4', terraces: '#a8b8a8', ruins: '#a8a490', canals: '#d8ccb8', savanna: '#d8a868', lanterns: '#c89a70',
   orchard: '#d8c8a8', lavender: '#e4cfa4', volcano: '#7a7076', cloudforest: '#c8d4c8', maple: '#c88a5a', summit: '#aab4cc',
+  saltflat: '#ffffff', beach: '#f2e2b8', lagoon: '#c8b090', cave: '#6a8a90', village: '#c8a880', bonfire: '#a89a80',
 };
 /** Surfaces that throw up water instead of (or as well as) dust. */
 const WET = new Set(['harbor', 'terraces']);
@@ -335,6 +336,23 @@ export class Renderer {
       ctx.fill();
     }
     const far = mix(P.ink, P.haze, 0.3);
+    // on the salt flat a skin of water turns the crust into a mirror: runners stand on their reflections
+    if (st.mirror) {
+      for (const i of order) {
+        const r = w.runners[i];
+        const x = this.runnerX(r);
+        const g = groundAt(w.L, x);
+        if (g === null || r.down) continue;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x - 80, g, 160, 140);
+        ctx.clip();
+        ctx.translate(0, g * 2);
+        ctx.scale(1, -1);
+        drawFigure(ctx, this.anims[i], { ink: mix(P.ink, P.haze, 0.45), far: mix(P.ink, P.haze, 0.6), alpha: 0.28 });
+        ctx.restore();
+      }
+    }
     for (const i of order) {
       const r = w.runners[i];
       const blink = r.invuln > 0 && !r.gliding && w.status === 'run' && !opts.attract ? (Math.floor(t * 14) % 2 ? 0.35 : 0.95) : 1;

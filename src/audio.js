@@ -443,6 +443,41 @@ export class AudioEngine {
       this.loopNoise('bandpass', 900, 0.7, 0.06, { rate: 0.12, depth: 150, target: 'freq' });
       this.loopNoise('highpass', 2600, 0.5, 0.02, { rate: 0.3, depth: 0.012, target: 'gain' });
       this.every(3, 7, () => this.bird());
+    } else if (id === 'saltflat') {
+      // nothing for miles: a soft wind, and the crust ticking as it warms
+      this.loopNoise('bandpass', 480, 2, 0.05, { rate: 0.04, depth: 160, target: 'freq' });
+      this.every(2, 5, () => this.noiseHit({ f: 5200, q: 6, d: 0.02, g: 0.02, dest: this.ambBus, pan: Math.random() * 1.6 - 0.8 }));
+    } else if (id === 'beach') {
+      // surf rolling in, and gulls
+      this.loopNoise('lowpass', 700, 0.6, 0.12, { rate: 0.12, depth: 0.09, target: 'gain' });
+      this.loopNoise('highpass', 2400, 0.4, 0.03, { rate: 0.12, depth: 0.025, target: 'gain' });
+      this.every(4, 9, () => this.tone({ f: 1400, f2: 900, a: 0.03, d: 0.35, g: 0.025, dest: this.ambBus }));
+    } else if (id === 'lagoon') {
+      // water lapping at the piles, insects in the heat
+      this.loopNoise('lowpass', 380, 0.6, 0.06, { rate: 0.4, depth: 0.04, target: 'gain' });
+      this.loopNoise('bandpass', 5000, 9, 0.025, { rate: 5, depth: 0.02, target: 'gain' });
+      this.every(3, 8, () => this.bird());
+    } else if (id === 'cave') {
+      // drips in a big echoing space, and the sea breathing somewhere outside
+      this.loopNoise('lowpass', 200, 0.6, 0.07, { rate: 0.1, depth: 0.05, target: 'gain' });
+      this.every(0.7, 2.2, () => {
+        const t = this.ctx.currentTime;
+        const f = 1200 + Math.random() * 1600;
+        this.tone({ t, f, f2: f * 0.6, a: 0.002, d: 0.08, g: 0.03, dest: this.reverb });
+      });
+    } else if (id === 'village') {
+      // boats creaking at their moorings, a bell, water under the boards
+      this.loopNoise('lowpass', 420, 0.6, 0.06, { rate: 0.25, depth: 0.04, target: 'gain' });
+      this.every(5, 10, () => this.tone({ f: 180, f2: 160, a: 0.2, d: 0.6, type: 'triangle', g: 0.012, dest: this.ambBus }));
+      this.every(12, 20, () => {
+        const t = this.ctx.currentTime;
+        this.tone({ t, f: 880, d: 2.6, g: 0.014, dest: this.ambBus });
+        this.tone({ t, f: 1320, d: 1.8, g: 0.008, dest: this.ambBus });
+      });
+    } else if (id === 'bonfire') {
+      // the fire crackling, waves on the sand, a lighthouse that does not make a sound
+      this.loopNoise('lowpass', 600, 0.6, 0.08, { rate: 0.1, depth: 0.06, target: 'gain' });
+      this.every(0.15, 0.6, () => this.noiseHit({ type: 'highpass', f: 2500 + Math.random() * 3000, q: 0.7, d: 0.02, g: 0.03 + Math.random() * 0.03, dest: this.ambBus, pan: 0.2 }));
     } else if (id === 'summit') {
       // thin cold wind, and the quiet of a very big sky
       this.loopNoise('bandpass', 700, 3, 0.05, { rate: 0.05, depth: 300, target: 'freq' });

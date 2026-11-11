@@ -3,8 +3,9 @@
 A hand-crafted stick-figure running game for the browser. **Mila** (stick girl) and **Arlo**
 (stick boy) have one day to get home across six stages, from a sunrise meadow to a frozen
 mountain pass at dawn. Then a postcard arrives, and chapter two takes them round the world in six
-more. Chapter three climbs through six wild places to a summit under falling stars. The long way
-round is an endless road through all eighteen. It plays on desktop (keyboard or
+more. Chapter three climbs through six wild places to a summit under falling stars, and chapter
+four runs down to the sea, ending at a bonfire on the beach. The long way round is an endless road
+through all twenty-four. It plays on desktop (keyboard or
 gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
 faster **Teen / Adult** mode.
 
@@ -95,6 +96,31 @@ observatory, where someone has the telescope out:
 
 ![The top of the world](docs/screenshots/top-of-the-world.jpg)
 
+## Chapter four: Down to the Sea
+
+Clearing the summit opens the last chapter: down from the mountains to the coast, and a fire on
+the beach where everybody is waiting.
+
+| # | Stage | Time of day | What gets in your way |
+|---|-------|-------------|-----------------------|
+| 19 | Mirror Flats | dawn | salt piles, salt bricks, pennant lines, brine pools, rolling tumbleweed |
+| 20 | Palm Beach | late morning | sandcastles, coolers, surfboards, beach umbrellas, a lifeguard tower, rolling beach balls |
+| 21 | Mangrove Lagoon | hot noon | crab traps, rope coils, canoes, mangrove roots, stilt huts, swinging nets, open water |
+| 22 | Glow Caves | low tide, underground | glowing crystals, low cave roofs, rock columns, rolling geodes, falling stalactites |
+| 23 | Stilt Village | golden hour | lobster pots, nets drying, bait sheds, swinging pots, rolling buoys, open water |
+| 24 | Bonfire Point | night | driftwood, dunes, a shell-hung driftwood arch, then the fire on the beach |
+
+| | |
+|---|---|
+| ![Mirror Flats](docs/screenshots/mirror-flats.jpg) | ![Palm Beach](docs/screenshots/palm-beach.jpg) |
+| ![Mangrove Lagoon](docs/screenshots/mangrove-lagoon.jpg) | ![Glow Caves](docs/screenshots/glow-caves.jpg) |
+| ![Stilt Village](docs/screenshots/stilt-village.jpg) | ![Bonfire Point](docs/screenshots/bonfire-point.jpg) |
+
+On the Mirror Flats a skin of water turns the salt into a mirror: the mountains, flamingos and the
+runners themselves are reflected in it. The trip ends at a bonfire under a lighthouse:
+
+![Everyone, together](docs/screenshots/everyone-together.jpg)
+
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
@@ -122,7 +148,7 @@ pair first, then random pairs from the cast.
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
-ending screens. It is one unbroken road through all eighteen landscapes, in order, over and over:
+ending screens. It is one unbroken road through all twenty-four landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -174,7 +200,8 @@ of the screen is Mila and the right half is Arlo (top = jump, bottom = slide). T
   soften naturally.
 - **Light and weather.** Sun glow, god rays, lamp light, lightning, an aurora, lit windows,
   fireworks, the Milky Way, shooting stars, lava glow, pollen, leaves, blossom petals, sand,
-  volcanic ash and embers, rain, warm drizzle, drifting mist, butterflies, sky lanterns and snow. A final pass adds grading, a vignette and film grain.
+  volcanic ash and embers, rain, warm drizzle, drifting mist, butterflies, sky lanterns, glow-worms,
+  fireflies, a lighthouse, a bonfire, mirror reflections on wet salt, and snow. A final pass adds grading, a vignette and film grain.
 - **Sound.** Everything is synthesized with Web Audio: footsteps per surface, birdsong, wind,
   rain, surf, thunder, and a quiet plucked-string score (Karplus–Strong) in a generated room
   reverb. There are no audio files.
@@ -188,7 +215,7 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all eighteen landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+all twenty-four landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
 also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
@@ -205,6 +232,7 @@ src/config.js               physics + difficulty constants, jump math
 src/stages.js               chapter one + chapters: palettes, hazards, weather, music
 src/stages-world.js         chapter two, round the world
 src/stages-skies.js         chapter three, under open skies
+src/stages-sea.js           chapter four, down to the sea
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
@@ -215,9 +243,11 @@ src/figure.js               skeleton, IK, poses, hair/scarf, cast faces and clot
 src/backgrounds.js          procedural parallax layers, sky, sun, aurora
 src/backgrounds-world.js    chapter two landscapes, fireworks
 src/backgrounds-skies.js    chapter three landscapes, Milky Way, meteors
+src/backgrounds-sea.js      chapter four landscapes, reflections
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
 src/art-world.js            chapter two ground, props, movers, decor, pavilion
 src/art-skies.js            chapter three ground, props, movers, decor, observatory
+src/art-sea.js              chapter four ground, props, movers, decor, bonfire
 src/fx.js                   particles, weather, grade/vignette/grain
 src/renderer.js             camera + frame composition
 src/audio.js                synthesized sound and music

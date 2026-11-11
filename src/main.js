@@ -27,7 +27,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 const ENDLESS = STAGES.length;
 const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
 const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
-const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen'];
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four'];
 
 const app = {
   screen: 'title',
@@ -609,7 +609,13 @@ const ENDINGS = [
     eyebrow: 'Stage eighteen · Starlight Summit',
     title: 'The top of the world.',
     text: (who) => `${who('reach', 'reaches')} the blanket by the observatory just as the sky starts to fall: one shooting star, then ten, then too many to count. Blossom, lavender, fire, cloud, maple and stars. That was the long way, and it was worth all of it.`,
-    note: 'That is every stage. The long way round still goes on and on, through all eighteen places.',
+    note: 'A last postcard, smelling of salt and woodsmoke: chapter four is open.',
+  },
+  {
+    eyebrow: 'Stage twenty-four · Bonfire Point',
+    title: 'Everyone, together.',
+    text: (who) => `${who('run', 'runs')} the last stretch of sand to the fire, where everybody is already waiting with a blanket and a spare marshmallow. The lighthouse goes round. Salt, sea, mangroves, caves, the village and now this. Twenty-four places, and every one of them led here.`,
+    note: 'That is every stage. The long way round still goes on and on, through all twenty-four places.',
   },
 ];
 

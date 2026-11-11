@@ -2,9 +2,10 @@
 // storage simply fall back to an in-memory state so the game always runs.
 
 import { ROSTER, DEFAULT_TEAM } from './cast.js';
+import { STAGES as ALL_STAGES } from './stages.js';
 
 const KEY = 'long-run-home.v1';
-const STAGES = 12;
+const STAGES = ALL_STAGES.length;
 const CHAPTER_ONE = 6;
 
 function defaults() {
@@ -19,7 +20,7 @@ export function load() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return d;
     const s = JSON.parse(raw);
-    // Saves from before chapter 2 hold six-stage arrays: pad them to the current length.
+    // Saves from before later chapters hold shorter arrays: pad them to the current length.
     const track = (def, saved = {}) => {
       const t = { ...def, ...saved };
       t.stars = Array.from({ length: STAGES }, (_, i) => (saved.stars && saved.stars[i]) || 0);

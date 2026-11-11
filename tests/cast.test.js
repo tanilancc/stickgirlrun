@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ROSTER, ROSTER_ORDER, DEFAULT_TEAM } from '../src/cast.js';
 import { World } from '../src/game.js';
+import { STAGES } from '../src/stages.js';
 
 test('the cast screen lists every runner exactly once, and only runners that exist', () => {
   assert.equal(new Set(ROSTER_ORDER).size, ROSTER_ORDER.length);
@@ -34,7 +35,7 @@ test('saves from before the cast keep their progress and pick Mila or Arlo', asy
   assert.deepEqual(s.settings.team, DEFAULT_TEAM);
   assert.deepEqual(s.settings.names, {});
   assert.equal(s.progress.adult.unlocked, 4);
-  assert.equal(s.progress.adult.stars.length, 12);
+  assert.equal(s.progress.adult.stars.length, STAGES.length);
   assert.deepEqual(s.progress.adult.stars.slice(0, 3), [3, 2, 1]);
   // an unknown runner in a saved team falls back to the default pair
   mem.set('long-run-home.v1', JSON.stringify({ settings: { runner: 'duo', team: ['nobody', 'curly'] } }));

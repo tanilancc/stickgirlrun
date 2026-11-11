@@ -2,6 +2,7 @@
 // world. Everything visual about a stage is driven from its entry.
 
 import { WORLD_STAGES } from './stages-world.js';
+import { SKY_STAGES } from './stages-skies.js';
 
 const HOME_STAGES = [
   {
@@ -255,12 +256,18 @@ const HOME_STAGES = [
   },
 ];
 
-export const STAGES = [...HOME_STAGES, ...WORLD_STAGES];
+export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES];
 
 /** Chapters group stages on the map; the last stage of each has its own ending. */
 export const CHAPTERS = [
   { name: 'The Long Run Home', subtitle: 'One day, six places, one cabin', from: 0, to: HOME_STAGES.length - 1 },
   { name: 'Postcards from Away', subtitle: 'Six places round the world', from: HOME_STAGES.length, to: HOME_STAGES.length + WORLD_STAGES.length - 1 },
+  {
+    name: 'Under Open Skies',
+    subtitle: 'Six wild places, and a night of falling stars',
+    from: HOME_STAGES.length + WORLD_STAGES.length,
+    to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length - 1,
+  },
 ];
 
 /** Everyone who can run lives in cast.js; CHARACTERS is kept as the old name for it. */

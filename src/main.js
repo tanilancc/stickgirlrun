@@ -27,7 +27,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 const ENDLESS = STAGES.length;
 const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
 const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
-const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen'];
 
 const app = {
   screen: 'title',
@@ -603,7 +603,13 @@ const ENDINGS = [
     eyebrow: 'Stage twelve · Lantern Festival',
     title: 'Worth the trip.',
     text: (who) => `${who('find', 'finds')} the spot by the river that somebody kept, just as the first fireworks go up. Sand, rain, ruins, canals, that enormous sun and now the lanterns: six postcards, and every one of them worth the run.`,
-    note: 'That is every stage. The long way round still goes on and on, through all twelve places.',
+    note: 'Another postcard, this one with a star drawn on it: chapter three is open.',
+  },
+  {
+    eyebrow: 'Stage eighteen · Starlight Summit',
+    title: 'The top of the world.',
+    text: (who) => `${who('reach', 'reaches')} the blanket by the observatory just as the sky starts to fall: one shooting star, then ten, then too many to count. Blossom, lavender, fire, cloud, maple and stars. That was the long way, and it was worth all of it.`,
+    note: 'That is every stage. The long way round still goes on and on, through all eighteen places.',
   },
 ];
 

@@ -14,6 +14,7 @@ import { clamp, mix, alpha, smooth } from './util.js';
 const DUST = {
   meadow: '#cdb89a', forest: '#8a7a5a', canyon: '#e2b98a', roof: '#a89a90', harbor: '#aac4dc', snow: '#ffffff',
   dunes: '#ecd2a4', terraces: '#a8b8a8', ruins: '#a8a490', canals: '#d8ccb8', savanna: '#d8a868', lanterns: '#c89a70',
+  orchard: '#d8c8a8', lavender: '#e4cfa4', volcano: '#7a7076', cloudforest: '#c8d4c8', maple: '#c88a5a', summit: '#aab4cc',
 };
 /** Surfaces that throw up water instead of (or as well as) dust. */
 const WET = new Set(['harbor', 'terraces']);
@@ -316,7 +317,7 @@ export class Renderer {
     drawObstacles(ctx, w.L, look, view, this.cam, t);
     drawMovers(ctx, w.L, look, view, this.cam, w.d, t);
     this.rollerDust(w, dt, st);
-    drawCoins(ctx, w.L, view, this.cam, t, st.id === 'harbor' || st.id === 'snow' || st.id === 'lanterns');
+    drawCoins(ctx, w.L, view, this.cam, t, st.id === 'harbor' || st.id === 'snow' || st.id === 'lanterns' || st.id === 'summit');
     drawPickups(ctx, w.L, t);
 
     // shadows + runners (the runner further back is drawn first)

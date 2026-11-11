@@ -7,6 +7,7 @@ import { GROUND_Y } from './config.js';
 import { segIndexAt, obstacleStart, lowerBound, moverState } from './level.js';
 import { clamp, mix, alpha, TAU, fract } from './util.js';
 import { WORLD_SEG, WATERY, worldPit, WORLD_OB, worldRoller, worldSwing, WORLD_DECOR, worldForeground, drawPavilion } from './art-world.js';
+import { SKY_SEG, skyPit, SKY_OB, skyRoller, skyDrop, SKY_DECOR, skyForeground, drawObservatory } from './art-skies.js';
 
 export function makeTone(P) {
   const cache = new Map();
@@ -105,7 +106,7 @@ export function drawTerrain(ctx, L, look, view, cam, t) {
     const sx0 = Math.max(s.x0, x0);
     const sx1 = Math.min(s.x1, x1);
     const k = look(s.th);
-    (SEG[k.st.terrain] || WORLD_SEG[k.st.terrain])(ctx, s, sx0, sx1, bottom, k.P, k.T, t, openL, openR);
+    (SEG[k.st.terrain] || WORLD_SEG[k.st.terrain] || SKY_SEG[k.st.terrain])(ctx, s, sx0, sx1, bottom, k.P, k.T, t, openL, openR);
   }
 }
 
@@ -138,7 +139,7 @@ function drawPit(ctx, terr, P, T, a, b, bottom, t) {
   const top = Math.max(a.y, b.y) + 1;
   const x0 = a.x1;
   const w = b.x0 - a.x1;
-  if (worldPit(ctx, terr, P, T, a, b, bottom, t)) return;
+  if (worldPit(ctx, terr, P, T, a, b, bottom, t) || skyPit(ctx, terr, P, T, a, b, bottom, t)) return;
   if (terr === 'meadow' || terr === 'forest') {
     ctx.fillStyle = vg(ctx, top, top + 120, T(mix(P.ground.body, '#000000', 0.35)), T(P.ground.deep));
     ctx.fillRect(x0, top, w, bottom - top);
@@ -583,8 +584,8 @@ const OB = {
     if (o.w > 140) drawBale(ctx, o.x + bw * 1.55, o.y + 6, bw * 0.45, hh - 6, T, o.seed + 9);
   },
   rock(ctx, o, T, P, t, st) {
-    const base = { canyon: '#a0583a', snow: '#5a6478', dunes: '#b88a5a', savanna: '#8a5a3e', ruins: '#7a7666', terraces: '#6e6c62' }[st.terrain] || '#7d7a72';
-    drawRock(ctx, o, T, base, st.terrain === 'snow', st.terrain === 'forest' || st.terrain === 'ruins' || st.terrain === 'terraces', P.light);
+    const base = { canyon: '#a0583a', snow: '#5a6478', dunes: '#b88a5a', savanna: '#8a5a3e', ruins: '#7a7666', terraces: '#6e6c62', maple: '#7a6a5e', summit: '#4e566c' }[st.terrain] || '#7d7a72';
+    drawRock(ctx, o, T, base, st.terrain === 'snow' || st.terrain === 'summit', st.terrain === 'forest' || st.terrain === 'ruins' || st.terrain === 'terraces' || st.terrain === 'maple', P.light);
   },
   boulderBig(ctx, o, T, P) {
     drawRock(ctx, o, T, '#6f6e66', false, true, P.light);
@@ -998,7 +999,7 @@ export function drawObstacles(ctx, L, look, view, cam, t) {
     const o = obs[i];
     if (o.x > x1) break;
     if (o.x + o.w < x0) continue;
-    const f = OB[o.skin] || WORLD_OB[o.skin];
+    const f = OB[o.skin] || WORLD_OB[o.skin] || SKY_OB[o.skin];
     if (!f) continue;
     const k = look(o.th);
     f(ctx, o, k.T, k.P, t, k.st);
@@ -1018,7 +1019,7 @@ export function drawMovers(ctx, L, look, view, cam, d, t) {
     const { T, P } = look(m.th);
     if (m.type === 'roller') drawRoller(ctx, m, s, T, P);
     else if (m.type === 'swing') drawSwing(ctx, m, s, T, P, t);
-    else drawIcicle(ctx, m, s, T, t);
+    else if (!skyDrop(ctx, m, s, T, t, P)) drawIcicle(ctx, m, s, T, t);
   }
 }
 
@@ -1031,7 +1032,7 @@ function drawRoller(ctx, m, s, T, P) {
   ctx.ellipse(0, r - 1, r * 0.9, 3, 0, 0, TAU);
   ctx.fill();
   ctx.rotate(rot);
-  if (worldRoller(ctx, m, r, T, P)) {
+  if (worldRoller(ctx, m, r, T, P) || skyRoller(ctx, m, r, T, P)) {
     /* chapter 2 skins */
   } else if (m.skin === 'hayroll') {
     ctx.fillStyle = T('#d9b466');
@@ -1059,7 +1060,7 @@ function drawRoller(ctx, m, s, T, P) {
       ctx.fill();
     }
   } else if (m.skin === 'boulder') {
-    ctx.fillStyle = T('#8a4a30');
+    ctx.fillStyle = T(P.boulder || '#8a4a30');
     ctx.beginPath();
     for (let k = 0; k < 10; k++) {
       const a = (k / 10) * TAU;
@@ -1417,7 +1418,7 @@ export function drawDecor(ctx, L, look, view, cam) {
   for (let i = lowerBound(dec, x0); i < dec.length; i++) {
     const d = dec[i];
     if (d.x > x1) break;
-    const f = DECOR[d.skin] || WORLD_DECOR[d.skin];
+    const f = DECOR[d.skin] || WORLD_DECOR[d.skin] || SKY_DECOR[d.skin];
     if (!f) continue;
     const k = look(d.th);
     f(ctx, d, k.T, k.P);
@@ -1567,6 +1568,8 @@ export function drawFinish(ctx, L, stage, P, T, t, open) {
     drawCabin(ctx, x + 380, y, T, P, t, open);
   } else if (stage.id === 'lanterns') {
     drawPavilion(ctx, x + 500, y, T, P, t, open);
+  } else if (stage.id === 'summit') {
+    drawObservatory(ctx, x + 560, y, T, P, t, open);
   }
   const post = T('#5a4230');
   ctx.fillStyle = post;
@@ -1683,7 +1686,7 @@ export function buildForeground(stage) {
   g.lineCap = 'round';
   for (let x = 60; x < W - 60; x += 380 + rng() * 520) {
     const kind = stage.terrain;
-    if (worldForeground(g, kind, x, H, rng)) {
+    if (worldForeground(g, kind, x, H, rng) || skyForeground(g, kind, x, H, rng)) {
       /* chapter 2 kinds */
     } else if (kind === 'meadow' || kind === 'forest') {
       for (let k = 0; k < 18; k++) {

@@ -92,6 +92,33 @@ export const SKINS = {
   hangingMoss: { kind: 'over', w: [90, 140], h: [40, 54] },
   mapleBranch: { kind: 'over', w: [90, 140], h: [44, 58] },
   starRope: { kind: 'over', w: [110, 180], h: [28, 38] },
+
+  // ---- chapter 4: down to the sea
+  saltPile: { kind: 'solid', w: [54, 74], h: [32, 42] },
+  saltBlocks: { kind: 'solid', w: [50, 66], h: [38, 48] },
+  sandcastle: { kind: 'solid', w: [56, 76], h: [34, 44] },
+  cooler: { kind: 'solid', w: [50, 64], h: [34, 42] },
+  surfboards: { kind: 'hazard', w: [40, 56], h: [50, 62] },
+  crabTrap: { kind: 'solid', w: [48, 62], h: [34, 42] },
+  ropeCoil: { kind: 'solid', w: [50, 64], h: [28, 36] },
+  canoe: { kind: 'solid', w: [110, 150], h: [30, 38] },
+  caveRock: { kind: 'solid', w: [50, 74], h: [30, 42] },
+  crystals: { kind: 'hazard', w: [44, 64], h: [40, 52] },
+  lobsterPots: { kind: 'solid', w: [54, 70], h: [40, 48] },
+  netPile: { kind: 'solid', w: [60, 84], h: [30, 38] },
+  driftwood: { kind: 'solid', w: [96, 140], h: [30, 38] },
+  saltStack: { kind: 'solid', w: [110, 160], h: [78, 92] },
+  lifeguard: { kind: 'solid', w: [100, 140], h: [80, 94] },
+  stiltHut: { kind: 'solid', w: [110, 150], h: [80, 94] },
+  caveColumn: { kind: 'solid', w: [100, 150], h: [78, 94] },
+  baitShed: { kind: 'solid', w: [110, 150], h: [80, 94] },
+  dune: { kind: 'solid', w: [130, 190], h: [76, 90] },
+  pennants: { kind: 'over', w: [110, 180], h: [28, 38] },
+  parasol: { kind: 'over', w: [90, 140], h: [36, 48] },
+  mangroveRoots: { kind: 'over', w: [90, 140], h: [44, 58] },
+  stalactites: { kind: 'over', w: [90, 150], h: [40, 54] },
+  dryNets: { kind: 'over', w: [100, 160], h: [40, 54] },
+  driftArch: { kind: 'over', w: [90, 140], h: [36, 48] },
 };
 
 export const stageLength = (stage, diff) => Math.round(stage.length * diff.lengthMul);

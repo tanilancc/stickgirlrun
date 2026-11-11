@@ -119,6 +119,28 @@ export const SKINS = {
   stalactites: { kind: 'over', w: [90, 150], h: [40, 54] },
   dryNets: { kind: 'over', w: [100, 160], h: [40, 54] },
   driftArch: { kind: 'over', w: [90, 140], h: [36, 48] },
+
+  // ---- chapter 5: home again
+  sinterMound: { kind: 'solid', w: [54, 74], h: [32, 42] },
+  geyserVent: { kind: 'hazard', w: [46, 62], h: [36, 46] },
+  bambooBundle: { kind: 'solid', w: [60, 84], h: [34, 42] },
+  bambooStumps: { kind: 'hazard', w: [48, 66], h: [36, 46] },
+  rockStack: { kind: 'solid', w: [42, 56], h: [40, 50] },
+  sage: { kind: 'hazard', w: [50, 68], h: [36, 44] },
+  tulipCrate: { kind: 'solid', w: [50, 66], h: [36, 44] },
+  bicycle: { kind: 'hazard', w: [60, 76], h: [40, 48] },
+  iceChunk: { kind: 'solid', w: [50, 72], h: [34, 44] },
+  picnicBasket: { kind: 'solid', w: [46, 58], h: [30, 38] },
+  sinterTerrace: { kind: 'solid', w: [120, 170], h: [78, 92] },
+  bambooPlatform: { kind: 'solid', w: [110, 150], h: [80, 94] },
+  mesaStep: { kind: 'solid', w: [120, 180], h: [78, 94] },
+  tulipCart: { kind: 'solid', w: [110, 150], h: [78, 92] },
+  serac: { kind: 'solid', w: [100, 150], h: [80, 94] },
+  trailArch: { kind: 'over', w: [90, 140], h: [34, 46] },
+  leaningBamboo: { kind: 'over', w: [100, 160], h: [28, 38] },
+  sandArch: { kind: 'over', w: [90, 140], h: [38, 50] },
+  flowerArch: { kind: 'over', w: [90, 140], h: [36, 48] },
+  iceArch: { kind: 'over', w: [90, 140], h: [38, 50] },
 };
 
 export const stageLength = (stage, diff) => Math.round(stage.length * diff.lengthMul);

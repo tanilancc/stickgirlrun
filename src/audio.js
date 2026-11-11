@@ -443,6 +443,44 @@ export class AudioEngine {
       this.loopNoise('bandpass', 900, 0.7, 0.06, { rate: 0.12, depth: 150, target: 'freq' });
       this.loopNoise('highpass', 2600, 0.5, 0.02, { rate: 0.3, depth: 0.012, target: 'gain' });
       this.every(3, 7, () => this.bird());
+    } else if (id === 'geyser') {
+      // boiling, hissing ground, and now and then the big one goes
+      this.loopNoise('bandpass', 260, 2, 0.05, { rate: 4, depth: 0.03, target: 'gain' });
+      this.loopNoise('highpass', 3600, 0.4, 0.025, { rate: 0.15, depth: 0.015, target: 'gain' });
+      this.every(9, 14, () => this.noiseHit({ type: 'highpass', f: 1200, q: 0.4, a: 0.4, d: 2.4, g: 0.06, dest: this.ambBus }));
+    } else if (id === 'bamboo') {
+      // bamboo knocking in the wind, leaves hissing overhead
+      this.loopNoise('highpass', 3000, 0.4, 0.035, { rate: 0.2, depth: 0.025, target: 'gain' });
+      this.every(1.5, 4, () => {
+        const t = this.ctx.currentTime;
+        const f = 300 + Math.random() * 260;
+        this.tone({ t, type: 'triangle', f, f2: f * 0.8, d: 0.12, g: 0.03, dest: this.ambBus });
+        if (Math.random() < 0.5) this.tone({ t: t + 0.11, type: 'triangle', f: f * 1.2, f2: f, d: 0.1, g: 0.02, dest: this.ambBus });
+      });
+    } else if (id === 'rainbow') {
+      // dry wind, a hawk, crickets in the sage
+      this.loopNoise('bandpass', 560, 4, 0.06, { rate: 0.06, depth: 220, target: 'freq' });
+      this.loopNoise('bandpass', 4800, 9, 0.02, { rate: 6, depth: 0.015, target: 'gain' });
+      this.every(10, 18, () => this.tone({ f: 2400, f2: 1600, a: 0.05, d: 0.9, g: 0.02, dest: this.ambBus }));
+    } else if (id === 'tulips') {
+      // windmill sails creaking round, larks
+      this.loopNoise('lowpass', 500, 0.5, 0.04, { rate: 0.08, depth: 200, target: 'freq' });
+      this.every(2.2, 4.5, () => this.tone({ type: 'sawtooth', f: 90, f2: 70, a: 0.2, d: 0.5, g: 0.008, dest: this.ambBus }));
+      this.every(1.5, 4, () => this.bird());
+    } else if (id === 'glacier') {
+      // the ice groaning and cracking, and water lapping at its foot
+      this.loopNoise('lowpass', 360, 0.6, 0.06, { rate: 0.2, depth: 0.04, target: 'gain' });
+      this.every(6, 12, () => this.tone({ type: 'sawtooth', f: 70, f2: 40, a: 0.3, d: 1.4, g: 0.02, dest: this.ambBus }));
+      this.every(8, 15, () => this.noiseHit({ type: 'lowpass', f: 400, q: 0.6, d: 0.6, g: 0.08, dest: this.ambBus }));
+    } else if (id === 'home') {
+      // crickets, an owl, the same birds as the very first morning
+      this.loopNoise('bandpass', 4400, 10, 0.03, { rate: 6, depth: 0.02, target: 'gain' });
+      this.every(3, 7, () => this.bird());
+      this.every(10, 18, () => {
+        const t = this.ctx.currentTime;
+        this.tone({ t, f: 420, f2: 390, a: 0.05, d: 0.4, g: 0.02, dest: this.ambBus });
+        this.tone({ t: t + 0.55, f: 410, f2: 380, a: 0.05, d: 0.6, g: 0.02, dest: this.ambBus });
+      });
     } else if (id === 'saltflat') {
       // nothing for miles: a soft wind, and the crust ticking as it warms
       this.loopNoise('bandpass', 480, 2, 0.05, { rate: 0.04, depth: 160, target: 'freq' });

@@ -4,8 +4,8 @@ A hand-crafted stick-figure running game for the browser. **Mila** (stick girl) 
 (stick boy) have one day to get home across six stages, from a sunrise meadow to a frozen
 mountain pass at dawn. Then a postcard arrives, and chapter two takes them round the world in six
 more. Chapter three climbs through six wild places to a summit under falling stars, and chapter
-four runs down to the sea, ending at a bonfire on the beach. The long way round is an endless road
-through all twenty-four. It plays on desktop (keyboard or
+four runs down to the sea, ending at a bonfire on the beach. Chapter five brings them home again,
+to the same cabin on a summer evening. The long way round is an endless road through all thirty. It plays on desktop (keyboard or
 gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
 faster **Teen / Adult** mode.
 
@@ -121,6 +121,31 @@ runners themselves are reflected in it. The trip ends at a bonfire under a light
 
 ![Everyone, together](docs/screenshots/everyone-together.jpg)
 
+## Chapter five: Home Again
+
+Clearing Bonfire Point opens the last chapter: six more places on the way back, ending where the
+story began, at the cabin from chapter one, now on a summer evening.
+
+| # | Stage | Time of day | What gets in your way |
+|---|-------|-------------|-----------------------|
+| 25 | Geyser Basin | steamy morning | sinter mounds, boiling vents, trail signs, travertine terraces, hot springs, rolling logs |
+| 26 | Bamboo Forest | green noon | bamboo bundles, cut stumps, leaning culms, bamboo platforms, a swinging bucket |
+| 27 | Painted Hills | hot afternoon | balanced rocks, sagebrush, striped arches and buttes, rolling boulders |
+| 28 | Tulip Fields | spring evening | crates of tulips, parked bikes, flower arches, a flower cart, canals, rolling cheese |
+| 29 | Glacier Bay | blue dusk | ice chunks, ice arches, seracs, crevasses, rolling snowballs, falling icicles |
+| 30 | Home Again | summer evening | a picnic basket, the old fence, the bench, washing on the line, a log pile, then home |
+
+| | |
+|---|---|
+| ![Geyser Basin](docs/screenshots/geyser-basin.jpg) | ![Bamboo Forest](docs/screenshots/bamboo-forest.jpg) |
+| ![Painted Hills](docs/screenshots/painted-hills.jpg) | ![Tulip Fields](docs/screenshots/tulip-fields.jpg) |
+| ![Glacier Bay](docs/screenshots/glacier-bay.jpg) | ![Home Again](docs/screenshots/home-again.jpg) |
+
+A geyser erupts every few seconds in the basin; the windmills turn over the tulips. At the end the
+porch lights are on and the table is laid outside:
+
+![Home again](docs/screenshots/home-again-ending.jpg)
+
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
@@ -148,7 +173,7 @@ pair first, then random pairs from the cast.
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
-ending screens. It is one unbroken road through all twenty-four landscapes, in order, over and over:
+ending screens. It is one unbroken road through all thirty landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -201,7 +226,8 @@ of the screen is Mila and the right half is Arlo (top = jump, bottom = slide). T
 - **Light and weather.** Sun glow, god rays, lamp light, lightning, an aurora, lit windows,
   fireworks, the Milky Way, shooting stars, lava glow, pollen, leaves, blossom petals, sand,
   volcanic ash and embers, rain, warm drizzle, drifting mist, butterflies, sky lanterns, glow-worms,
-  fireflies, a lighthouse, a bonfire, mirror reflections on wet salt, and snow. A final pass adds grading, a vignette and film grain.
+  fireflies, a lighthouse, a bonfire, an erupting geyser, turning windmills, mirror reflections on
+  wet salt, and snow. A final pass adds grading, a vignette and film grain.
 - **Sound.** Everything is synthesized with Web Audio: footsteps per surface, birdsong, wind,
   rain, surf, thunder, and a quiet plucked-string score (Karplus–Strong) in a generated room
   reverb. There are no audio files.
@@ -215,7 +241,7 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all twenty-four landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+all thirty landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
 also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
@@ -233,6 +259,7 @@ src/stages.js               chapter one + chapters: palettes, hazards, weather, 
 src/stages-world.js         chapter two, round the world
 src/stages-skies.js         chapter three, under open skies
 src/stages-sea.js           chapter four, down to the sea
+src/stages-return.js        chapter five, home again
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
@@ -244,10 +271,12 @@ src/backgrounds.js          procedural parallax layers, sky, sun, aurora
 src/backgrounds-world.js    chapter two landscapes, fireworks
 src/backgrounds-skies.js    chapter three landscapes, Milky Way, meteors
 src/backgrounds-sea.js      chapter four landscapes, reflections
+src/backgrounds-return.js   chapter five landscapes
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
 src/art-world.js            chapter two ground, props, movers, decor, pavilion
 src/art-skies.js            chapter three ground, props, movers, decor, observatory
 src/art-sea.js              chapter four ground, props, movers, decor, bonfire
+src/art-return.js           chapter five ground, props, decor, the cabin in summer
 src/fx.js                   particles, weather, grade/vignette/grain
 src/renderer.js             camera + frame composition
 src/audio.js                synthesized sound and music

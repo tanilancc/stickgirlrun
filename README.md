@@ -5,8 +5,9 @@ A hand-crafted stick-figure running game for the browser. **Mila** (stick girl) 
 mountain pass at dawn. Then a postcard arrives, and chapter two takes them round the world in six
 more. Chapter three climbs through six wild places to a summit under falling stars, and chapter
 four runs down to the sea, ending at a bonfire on the beach. Chapter five brings them home again,
-to the same cabin on a summer evening. The long way round is an endless road through all thirty. It plays on desktop (keyboard or
-gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
+to the same cabin on a summer evening, and chapter six follows a poster on the gate to the harvest
+fair, three valleys over. The long way round is an endless road through all thirty-six. It plays
+on desktop (keyboard or gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
 faster **Teen / Adult** mode.
 
 ![Title screen](docs/screenshots/title.jpg)
@@ -146,6 +147,31 @@ porch lights are on and the table is laid outside:
 
 ![Home again](docs/screenshots/home-again-ending.jpg)
 
+## Chapter six: The Harvest Fair
+
+Back home, a poster on the gate: the harvest fair, three valleys over. Six autumn places lead
+there, from frosty pumpkin fields at sunrise to the fair itself at night.
+
+| # | Stage | Time of day | What gets in your way |
+|---|-------|-------------|-----------------------|
+| 31 | Pumpkin Patch | frosty sunrise | heaps of pumpkins, a scarecrow (and his crow), hay bales, a pick-your-own banner, a hay wagon, rolling pumpkins |
+| 32 | Mill Stream | autumn morning | flour sacks, brambles, the mill flume, stacked sacks, a swinging sack, rolling millstones, falling conkers |
+| 33 | Heather Moor | windy afternoon | peat stacks, gorse, stone walls, a dolmen, granite tors, rolling boulders |
+| 34 | The Viaduct | late afternoon | milk churns, luggage, a brazier, a signal gantry, a goods wagon, missing spans, rolling cable drums |
+| 35 | Vineyard Hills | golden hour | crates of grapes, vine rows, barrels, the cellar gateway, barrel racks, rolling casks |
+| 36 | The Harvest Fair | night | prize vegetables, a coconut shy, pumpkins, a balloon seller, an organ wagon, a swing boat, then the gate |
+
+| | |
+|---|---|
+| ![Pumpkin Patch](docs/screenshots/pumpkin-patch.jpg) | ![Mill Stream](docs/screenshots/mill-stream.jpg) |
+| ![Heather Moor](docs/screenshots/heather-moor.jpg) | ![The Viaduct](docs/screenshots/the-viaduct.jpg) |
+| ![Vineyard Hills](docs/screenshots/vineyard-hills.jpg) | ![The Harvest Fair](docs/screenshots/harvest-fair.jpg) |
+
+The mill wheel turns on its stream, a steam train crosses the far side of the valley below the
+viaduct, and thistledown blows across the moor. At the end the big wheel lights up over the gate:
+
+![All the lights of the fair](docs/screenshots/harvest-fair-ending.jpg)
+
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
@@ -173,7 +199,7 @@ pair first, then random pairs from the cast.
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
-ending screens. It is one unbroken road through all thirty landscapes, in order, over and over:
+ending screens. It is one unbroken road through all thirty-six landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -241,7 +267,7 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all thirty landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+all thirty-six landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
 also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
@@ -260,6 +286,7 @@ src/stages-world.js         chapter two, round the world
 src/stages-skies.js         chapter three, under open skies
 src/stages-sea.js           chapter four, down to the sea
 src/stages-return.js        chapter five, home again
+src/stages-fair.js          chapter six, the harvest fair
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
@@ -272,11 +299,13 @@ src/backgrounds-world.js    chapter two landscapes, fireworks
 src/backgrounds-skies.js    chapter three landscapes, Milky Way, meteors
 src/backgrounds-sea.js      chapter four landscapes, reflections
 src/backgrounds-return.js   chapter five landscapes
+src/backgrounds-fair.js     chapter six landscapes, mill wheel, train, big wheel
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
 src/art-world.js            chapter two ground, props, movers, decor, pavilion
 src/art-skies.js            chapter three ground, props, movers, decor, observatory
 src/art-sea.js              chapter four ground, props, movers, decor, bonfire
 src/art-return.js           chapter five ground, props, decor, the cabin in summer
+src/art-fair.js             chapter six ground, props, movers, decor, the fair gate
 src/fx.js                   particles, weather, grade/vignette/grain
 src/renderer.js             camera + frame composition
 src/audio.js                synthesized sound and music

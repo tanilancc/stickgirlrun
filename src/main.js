@@ -27,7 +27,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 const ENDLESS = STAGES.length;
 const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
 const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
-const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty'];
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty', 'thirty-one', 'thirty-two', 'thirty-three', 'thirty-four', 'thirty-five', 'thirty-six'];
 
 const app = {
   screen: 'title',
@@ -621,7 +621,13 @@ const ENDINGS = [
     eyebrow: 'Stage thirty · Home Again',
     title: 'Home again.',
     text: (who) => `${who('come', 'comes')} up the same path as the very first morning. The porch lights are on, the table is laid outside, and the door is open. Steam, bamboo, painted hills, tulips, the glacier, and home. Thirty places, and the best one was here all along.`,
-    note: 'That is every stage. The long way round still goes on and on, through all thirty places.',
+    note: 'Then a poster, pinned to the gate: the harvest fair, three valleys over. Chapter six is open.',
+  },
+  {
+    eyebrow: 'Stage thirty-six · The Harvest Fair',
+    title: 'All the lights of the fair.',
+    text: (who) => `${who('run', 'runs')} in under the arch just as the big wheel lights up all at once. There are toffee apples, a band organ playing, and fireworks over the field. Pumpkins, the mill, the moor, the viaduct, the vines, and now the fair. Thirty-six places, and the year still turning.`,
+    note: 'That is every stage. The long way round still goes on and on, through all thirty-six places.',
   },
 ];
 

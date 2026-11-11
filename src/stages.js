@@ -1,10 +1,12 @@
 // The stages. Chapter 1 is the journey home; chapter 2 (stages-world.js) is a trip round the
-// world. Everything visual about a stage is driven from its entry.
+// world; chapters 3 to 6 each live in their own stages-*.js. Everything visual about a stage
+// is driven from its entry.
 
 import { WORLD_STAGES } from './stages-world.js';
 import { SKY_STAGES } from './stages-skies.js';
 import { SEA_STAGES } from './stages-sea.js';
 import { RETURN_STAGES } from './stages-return.js';
+import { FAIR_STAGES } from './stages-fair.js';
 
 const HOME_STAGES = [
   {
@@ -258,7 +260,7 @@ const HOME_STAGES = [
   },
 ];
 
-export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES, ...SEA_STAGES, ...RETURN_STAGES];
+export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES, ...SEA_STAGES, ...RETURN_STAGES, ...FAIR_STAGES];
 
 /** Chapters group stages on the map; the last stage of each has its own ending. */
 export const CHAPTERS = [
@@ -281,6 +283,12 @@ export const CHAPTERS = [
     subtitle: 'Six last places, and the porch light on',
     from: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length,
     to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length + RETURN_STAGES.length - 1,
+  },
+  {
+    name: 'The Harvest Fair',
+    subtitle: 'Six autumn places, and the lights of the fair',
+    from: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length + RETURN_STAGES.length,
+    to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length + RETURN_STAGES.length + FAIR_STAGES.length - 1,
   },
 ];
 

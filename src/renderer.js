@@ -17,6 +17,7 @@ const DUST = {
   orchard: '#d8c8a8', lavender: '#e4cfa4', volcano: '#7a7076', cloudforest: '#c8d4c8', maple: '#c88a5a', summit: '#aab4cc',
   saltflat: '#ffffff', beach: '#f2e2b8', lagoon: '#c8b090', cave: '#6a8a90', village: '#c8a880', bonfire: '#a89a80',
   geyser: '#f0e8d8', bamboo: '#b0a070', rainbow: '#e8b080', tulips: '#a89070', glacier: '#ffffff', home: '#cdb89a',
+  pumpkin: '#b8a888', mill: '#a89060', moor: '#8a7a6a', viaduct: '#c8bca8', vineyard: '#d8b080', fair: '#a89a70',
 };
 /** Surfaces that throw up water instead of (or as well as) dust. */
 const WET = new Set(['harbor', 'terraces']);

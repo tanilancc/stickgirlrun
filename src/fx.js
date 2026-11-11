@@ -189,7 +189,7 @@ export class Weather {
     this.birdT = 3 + Math.random() * 4;
     this.tumble = null;
     this.tumbleT = 6;
-    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190, drizzle: 150, butterflies: 9, lanterns: 26, petals: 34, ash: 110, mist: 9, glowworms: 60, fireflies: 34 };
+    const counts = { pollen: 30, leaves: 24, sand: 70, dusk: 14, rain: 260, snow: 190, drizzle: 150, butterflies: 9, lanterns: 26, petals: 34, ash: 110, mist: 9, glowworms: 60, fireflies: 34, thistledown: 38 };
     const n = counts[this.kind] || 0;
     for (let i = 0; i < n; i++) this.items.push(this.spawn(true));
   }
@@ -207,6 +207,7 @@ export class Weather {
     }
     if (this.kind === 'sand') o.y = lerp(view.top + 40, view.bottom, Math.random());
     if (this.kind === 'pollen' || this.kind === 'dusk') o.y = lerp(250, 430, Math.random());
+    if (this.kind === 'thistledown') o.y = lerp(140, 440, Math.random());
     if (this.kind === 'butterflies') {
       o.y = lerp(250, 410, Math.random());
       o.col = ['#f2c14e', '#e86a3a', '#9ad0f0', '#f4f0e6', '#c86ad8'][Math.floor(Math.random() * 5)];
@@ -257,6 +258,13 @@ export class Weather {
         const sp = k === 'glowworms' ? 4 : 16;
         o.x += Math.sin(t * 0.5 + o.ph) * sp * dt;
         o.y += Math.cos(t * 0.4 + o.ph * 1.3) * sp * 0.6 * dt;
+      } else if (k === 'thistledown') {
+        // seed fluff carried along on the wind, lifting and dipping with the gusts
+        const gust = 40 + Math.sin(t * 0.4) * 25;
+        o.x -= (gust + 50 * o.z) * dt;
+        o.y += (Math.sin(t * 1.3 + o.ph) * 14 - 3) * dt;
+        o.rot += dt * 0.6;
+        if (o.y < 120 || o.y > 460) o.y = lerp(160, 420, Math.random());
       } else if (k === 'drizzle') {
         o.y += (520 + 260 * o.z) * dt;
         o.x -= 70 * o.z * dt;
@@ -345,6 +353,23 @@ export class Weather {
         ctx.fill();
       }
       ctx.restore();
+    } else if (k === 'thistledown') {
+      ctx.lineWidth = 0.5;
+      for (const o of this.items) {
+        const r = 1.2 + o.z * 2.6;
+        ctx.strokeStyle = alpha('#ffffff', 0.25 + o.z * 0.35);
+        ctx.beginPath();
+        for (let j = 0; j < 6; j++) {
+          const a = o.rot + (j / 6) * TAU;
+          ctx.moveTo(o.x, o.y);
+          ctx.lineTo(o.x + Math.cos(a) * r, o.y + Math.sin(a) * r);
+        }
+        ctx.stroke();
+        ctx.fillStyle = alpha('#fffdf6', 0.45 + o.z * 0.4);
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, 0.5 + o.z * 0.6, 0, TAU);
+        ctx.fill();
+      }
     } else if (k === 'leaves') {
       for (const o of this.items) {
         ctx.save();

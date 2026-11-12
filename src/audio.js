@@ -481,6 +481,38 @@ export class AudioEngine {
         this.tone({ t, f: 420, f2: 390, a: 0.05, d: 0.4, g: 0.02, dest: this.ambBus });
         this.tone({ t: t + 0.55, f: 410, f2: 380, a: 0.05, d: 0.6, g: 0.02, dest: this.ambBus });
       });
+    } else if (id === 'pasture') {
+      // cowbells all over the hillside, near and far, and larks
+      this.loopNoise('lowpass', 460, 0.5, 0.035, { rate: 0.07, depth: 180, target: 'freq' });
+      this.every(0.5, 1.6, () => {
+        const t = this.ctx.currentTime;
+        const f = 900 + Math.random() * 700;
+        const g = 0.004 + Math.random() * 0.01;
+        for (let k = 0; k < 1 + Math.floor(Math.random() * 3); k++) {
+          this.tone({ t: t + k * 0.22, type: 'triangle', f, d: 0.35, g, dest: this.ambBus });
+          this.tone({ t: t + k * 0.22, type: 'sine', f: f * 2.76, d: 0.2, g: g * 0.5, dest: this.ambBus });
+        }
+      });
+      this.every(2, 5, () => this.bird());
+    } else if (id === 'cliffpath') {
+      // the waterfall roaring across the gorge, wind on the rock, choughs calling
+      this.loopNoise('bandpass', 700, 0.5, 0.09, { rate: 0.2, depth: 160, target: 'freq' });
+      this.loopNoise('lowpass', 200, 0.6, 0.06);
+      this.every(5, 10, () => {
+        const t = this.ctx.currentTime;
+        this.tone({ t, f: 2200, f2: 1700, a: 0.01, d: 0.18, g: 0.014, dest: this.ambBus });
+        this.tone({ t: t + 0.25, f: 2300, f2: 1800, a: 0.01, d: 0.16, g: 0.01, dest: this.ambBus });
+      });
+    } else if (id === 'lake') {
+      // water lapping on the stones, a loon far out, somebody splashing
+      this.loopNoise('lowpass', 520, 0.6, 0.05, { rate: 0.5, depth: 0.03, target: 'gain' });
+      this.every(3, 7, () => this.bird());
+      this.every(12, 22, () => {
+        const t = this.ctx.currentTime;
+        this.tone({ t, f: 600, f2: 900, a: 0.3, d: 1.2, g: 0.012, dest: this.ambBus });
+        this.tone({ t: t + 1.6, f: 880, f2: 640, a: 0.2, d: 1.4, g: 0.01, dest: this.ambBus });
+      });
+      this.every(6, 12, () => this.noiseHit({ type: 'highpass', f: 1800, q: 0.5, d: 0.3, g: 0.025, dest: this.ambBus, pan: Math.random() * 1.2 - 0.6 }));
     } else if (id === 'pumpkin') {
       // a cold still morning: crows arguing over the field, a cockerel somewhere
       this.loopNoise('lowpass', 420, 0.5, 0.04, { rate: 0.06, depth: 160, target: 'freq' });

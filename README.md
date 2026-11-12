@@ -3,10 +3,10 @@
 A hand-crafted stick-figure running game for the browser. **Mila** (stick girl) and **Arlo**
 (stick boy) have one day to get home across six stages, from a sunrise meadow to a frozen
 mountain pass at dawn. Then a postcard arrives, and chapter two takes them round the world in six
-more. Chapter three climbs through six wild places to a summit under falling stars, and chapter
-four runs down to the sea, ending at a bonfire on the beach. Chapter five brings them home again,
+more. Chapter three climbs through wild places to a summit under falling stars and down the other
+side to a turquoise lake, and chapter four runs down to the sea, ending at a bonfire on the beach. Chapter five brings them home again,
 to the same cabin on a summer evening, and chapter six follows a poster on the gate to the harvest
-fair, three valleys over. The long way round is an endless road through all thirty-six. It plays
+fair, three valleys over. The long way round is an endless road through all thirty-nine. It plays
 on desktop (keyboard or gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
 faster **Teen / Adult** mode.
 
@@ -74,8 +74,8 @@ The trip ends by the river with fireworks, at a spot somebody saved:
 
 ## Chapter three: Under Open Skies
 
-Clearing the Lantern Festival opens the third chapter: six wild places, from spring blossom to a
-mountain top at night.
+Clearing the Lantern Festival opens the third chapter: nine wild places, from spring blossom to a
+mountain top at night, and then the long way down the next day.
 
 | # | Stage | Time of day | What gets in your way |
 |---|-------|-------------|-----------------------|
@@ -84,7 +84,10 @@ mountain top at night.
 | 15 | Fire Island | smoky afternoon | basalt and pumice, rock arches, basalt columns, lava pits, rolling lava bombs, glowing rocks falling from overhangs |
 | 16 | Cloud Forest | misty morning | mossy logs, tree ferns, moss-bearded trunks, giant stumps, drops into the cloud, swinging stones |
 | 17 | Maple Gorge | autumn afternoon | pumpkins, maple limbs, log piles, a river gorge, rolling pumpkins |
-| 18 | Starlight Summit | clear night | cairns, fairy-light strings, crevasses, rolling boulders, then the observatory |
+| 18 | Starlight Summit | clear night | cairns, fairy-light strings, crevasses, rolling boulders, the observatory |
+| 19 | Cowbell Pasture | sunrise | woodpiles, zigzag rail fences, milk churns, a gate hung with cowbells, firewood stacks, rolling cheese wheels |
+| 20 | Cliff Path | morning | scree, chain posts, an overhanging cliff, rocks with iron rungs, gaps over the gorge, rolling boulders |
+| 21 | Turquoise Lake | noon | upturned boats, drowned roots, pine boughs, a jetty, rolling logs, then the boathouse |
 
 | | |
 |---|---|
@@ -97,6 +100,14 @@ observatory, where someone has the telescope out:
 
 ![The top of the world](docs/screenshots/top-of-the-world.jpg)
 
+The next morning the peaks turn pink over a pasture full of cowbells. The path down is cut into
+a cliff, with a waterfall across the gorge, and it ends at a lake so blue it looks painted:
+
+| | |
+|---|---|
+| ![Cowbell Pasture](docs/screenshots/cowbell-pasture.jpg) | ![Cliff Path](docs/screenshots/cliff-path.jpg) |
+| ![Turquoise Lake](docs/screenshots/turquoise-lake.jpg) | ![The long way down](docs/screenshots/the-long-way-down.jpg) |
+
 ## Chapter four: Down to the Sea
 
 Clearing the summit opens the last chapter: down from the mountains to the coast, and a fire on
@@ -104,12 +115,12 @@ the beach where everybody is waiting.
 
 | # | Stage | Time of day | What gets in your way |
 |---|-------|-------------|-----------------------|
-| 19 | Mirror Flats | dawn | salt piles, salt bricks, pennant lines, brine pools, rolling tumbleweed |
-| 20 | Palm Beach | late morning | sandcastles, coolers, surfboards, beach umbrellas, a lifeguard tower, rolling beach balls |
-| 21 | Mangrove Lagoon | hot noon | crab traps, rope coils, canoes, mangrove roots, stilt huts, swinging nets, open water |
-| 22 | Glow Caves | low tide, underground | glowing crystals, low cave roofs, rock columns, rolling geodes, falling stalactites |
-| 23 | Stilt Village | golden hour | lobster pots, nets drying, bait sheds, swinging pots, rolling buoys, open water |
-| 24 | Bonfire Point | night | driftwood, dunes, a shell-hung driftwood arch, then the fire on the beach |
+| 22 | Mirror Flats | dawn | salt piles, salt bricks, pennant lines, brine pools, rolling tumbleweed |
+| 23 | Palm Beach | late morning | sandcastles, coolers, surfboards, beach umbrellas, a lifeguard tower, rolling beach balls |
+| 24 | Mangrove Lagoon | hot noon | crab traps, rope coils, canoes, mangrove roots, stilt huts, swinging nets, open water |
+| 25 | Glow Caves | low tide, underground | glowing crystals, low cave roofs, rock columns, rolling geodes, falling stalactites |
+| 26 | Stilt Village | golden hour | lobster pots, nets drying, bait sheds, swinging pots, rolling buoys, open water |
+| 27 | Bonfire Point | night | driftwood, dunes, a shell-hung driftwood arch, then the fire on the beach |
 
 | | |
 |---|---|
@@ -129,12 +140,12 @@ story began, at the cabin from chapter one, now on a summer evening.
 
 | # | Stage | Time of day | What gets in your way |
 |---|-------|-------------|-----------------------|
-| 25 | Geyser Basin | steamy morning | sinter mounds, boiling vents, trail signs, travertine terraces, hot springs, rolling logs |
-| 26 | Bamboo Forest | green noon | bamboo bundles, cut stumps, leaning culms, bamboo platforms, a swinging bucket |
-| 27 | Painted Hills | hot afternoon | balanced rocks, sagebrush, striped arches and buttes, rolling boulders |
-| 28 | Tulip Fields | spring evening | crates of tulips, parked bikes, flower arches, a flower cart, canals, rolling cheese |
-| 29 | Glacier Bay | blue dusk | ice chunks, ice arches, seracs, crevasses, rolling snowballs, falling icicles |
-| 30 | Home Again | summer evening | a picnic basket, the old fence, the bench, washing on the line, a log pile, then home |
+| 28 | Geyser Basin | steamy morning | sinter mounds, boiling vents, trail signs, travertine terraces, hot springs, rolling logs |
+| 29 | Bamboo Forest | green noon | bamboo bundles, cut stumps, leaning culms, bamboo platforms, a swinging bucket |
+| 30 | Painted Hills | hot afternoon | balanced rocks, sagebrush, striped arches and buttes, rolling boulders |
+| 31 | Tulip Fields | spring evening | crates of tulips, parked bikes, flower arches, a flower cart, canals, rolling cheese |
+| 32 | Glacier Bay | blue dusk | ice chunks, ice arches, seracs, crevasses, rolling snowballs, falling icicles |
+| 33 | Home Again | summer evening | a picnic basket, the old fence, the bench, washing on the line, a log pile, then home |
 
 | | |
 |---|---|
@@ -154,12 +165,12 @@ there, from frosty pumpkin fields at sunrise to the fair itself at night.
 
 | # | Stage | Time of day | What gets in your way |
 |---|-------|-------------|-----------------------|
-| 31 | Pumpkin Patch | frosty sunrise | heaps of pumpkins, a scarecrow (and his crow), hay bales, a pick-your-own banner, a hay wagon, rolling pumpkins |
-| 32 | Mill Stream | autumn morning | flour sacks, brambles, the mill flume, stacked sacks, a swinging sack, rolling millstones, falling conkers |
-| 33 | Heather Moor | windy afternoon | peat stacks, gorse, stone walls, a dolmen, granite tors, rolling boulders |
-| 34 | The Viaduct | late afternoon | milk churns, luggage, a brazier, a signal gantry, a goods wagon, missing spans, rolling cable drums |
-| 35 | Vineyard Hills | golden hour | crates of grapes, vine rows, barrels, the cellar gateway, barrel racks, rolling casks |
-| 36 | The Harvest Fair | night | prize vegetables, a coconut shy, pumpkins, a balloon seller, an organ wagon, a swing boat, then the gate |
+| 34 | Pumpkin Patch | frosty sunrise | heaps of pumpkins, a scarecrow (and his crow), hay bales, a pick-your-own banner, a hay wagon, rolling pumpkins |
+| 35 | Mill Stream | autumn morning | flour sacks, brambles, the mill flume, stacked sacks, a swinging sack, rolling millstones, falling conkers |
+| 36 | Heather Moor | windy afternoon | peat stacks, gorse, stone walls, a dolmen, granite tors, rolling boulders |
+| 37 | The Viaduct | late afternoon | milk churns, luggage, a brazier, a signal gantry, a goods wagon, missing spans, rolling cable drums |
+| 38 | Vineyard Hills | golden hour | crates of grapes, vine rows, barrels, the cellar gateway, barrel racks, rolling casks |
+| 39 | The Harvest Fair | night | prize vegetables, a coconut shy, pumpkins, a balloon seller, an organ wagon, a swing boat, then the gate |
 
 | | |
 |---|---|
@@ -199,7 +210,7 @@ pair first, then random pairs from the cast.
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
-ending screens. It is one unbroken road through all thirty-six landscapes, in order, over and over:
+ending screens. It is one unbroken road through all thirty-nine landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -267,7 +278,7 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all thirty-six landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+all thirty-nine landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
 also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
@@ -284,6 +295,7 @@ src/config.js               physics + difficulty constants, jump math
 src/stages.js               chapter one + chapters: palettes, hazards, weather, music
 src/stages-world.js         chapter two, round the world
 src/stages-skies.js         chapter three, under open skies
+src/stages-alpine.js        chapter three, the long way down
 src/stages-sea.js           chapter four, down to the sea
 src/stages-return.js        chapter five, home again
 src/stages-fair.js          chapter six, the harvest fair
@@ -297,12 +309,14 @@ src/figure.js               skeleton, IK, poses, hair/scarf, cast faces and clot
 src/backgrounds.js          procedural parallax layers, sky, sun, aurora
 src/backgrounds-world.js    chapter two landscapes, fireworks
 src/backgrounds-skies.js    chapter three landscapes, Milky Way, meteors
+src/backgrounds-alpine.js   the way down: pasture, gorge and waterfall, the lake
 src/backgrounds-sea.js      chapter four landscapes, reflections
 src/backgrounds-return.js   chapter five landscapes
 src/backgrounds-fair.js     chapter six landscapes, mill wheel, train, big wheel
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
 src/art-world.js            chapter two ground, props, movers, decor, pavilion
 src/art-skies.js            chapter three ground, props, movers, decor, observatory
+src/art-alpine.js           the way down: ground, props, the boathouse
 src/art-sea.js              chapter four ground, props, movers, decor, bonfire
 src/art-return.js           chapter five ground, props, decor, the cabin in summer
 src/art-fair.js             chapter six ground, props, movers, decor, the fair gate

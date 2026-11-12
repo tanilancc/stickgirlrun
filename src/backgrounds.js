@@ -9,6 +9,7 @@ import { SKY_THEMES, drawMeteors } from './backgrounds-skies.js';
 import { SEA_THEMES } from './backgrounds-sea.js';
 import { RETURN_THEMES } from './backgrounds-return.js';
 import { FAIR_THEMES, fairDyn } from './backgrounds-fair.js';
+import { ALPINE_THEMES, alpineDyn } from './backgrounds-alpine.js';
 import { clamp, mix, alpha, TAU, fract } from './util.js';
 
 export const TW = 2048;
@@ -970,7 +971,7 @@ export function buildBackground(stage) {
   const rng = mulberry32(stage.seed * 31 + 5);
   const P = stage.palette;
   // looked up at call time so the import cycle with backgrounds-world.js is harmless
-  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain] || SKY_THEMES[stage.terrain] || SEA_THEMES[stage.terrain] || RETURN_THEMES[stage.terrain] || FAIR_THEMES[stage.terrain])(P, rng);
+  const theme = (THEMES[stage.terrain] || WORLD_THEMES[stage.terrain] || SKY_THEMES[stage.terrain] || SEA_THEMES[stage.terrain] || RETURN_THEMES[stage.terrain] || FAIR_THEMES[stage.terrain] || ALPINE_THEMES[stage.terrain])(P, rng);
   if (theme.fogAfter) {
     for (const k of Object.keys(theme.fogAfter)) theme.fogAfter[k].tile = fogTile(theme.fogAfter[k].color, stage.terrain === 'forest' ? 1.4 : 1);
   }
@@ -1110,7 +1111,7 @@ function drawSea(ctx, bg, view, cam, t, P) {
 }
 
 function drawDyn(ctx, d, x, y, t, P) {
-  if (fairDyn(ctx, d, x, y, t, P)) return;
+  if (fairDyn(ctx, d, x, y, t, P) || alpineDyn(ctx, d, x, y, t)) return;
   if (d.type === 'windmill') {
     ctx.strokeStyle = d.color;
     ctx.lineWidth = 2.2;

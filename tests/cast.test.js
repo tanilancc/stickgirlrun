@@ -42,3 +42,24 @@ test('saves from before the cast keep their progress and pick Mila or Arlo', asy
   assert.deepEqual(load().settings.team, DEFAULT_TEAM);
   delete globalThis.localStorage;
 });
+
+test('stages added mid-game keep old saves lined up with the right stages', async () => {
+  const mem = new Map();
+  globalThis.localStorage = { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => mem.set(k, String(v)) };
+  const { INSERTED_STAGES } = await import('../src/stages.js');
+  const legacy = STAGES.map((s) => s.id).filter((id) => !INSERTED_STAGES.includes(id));
+  // a save with no order, made when Bonfire Point was the last stage reached
+  const stars = legacy.map((id, i) => (i < 24 ? 1 + (i % 3) : 0));
+  mem.set('long-run-home.v1', JSON.stringify({ progress: { adult: { unlocked: 24, stars, coins: stars } } }));
+  const { load, save } = await import('../src/storage.js');
+  const s = load();
+  const at = (id) => STAGES.findIndex((st) => st.id === id);
+  for (let i = 0; i < 24; i++) assert.equal(s.progress.adult.stars[at(legacy[i])], stars[i], legacy[i]);
+  for (const id of INSERTED_STAGES) assert.equal(s.progress.adult.stars[at(id)], 0, id);
+  assert.equal(s.progress.adult.unlocked, at('bonfire') + 1);
+  // once saved again it carries its order, and loads back unchanged
+  save(s);
+  assert.deepEqual(JSON.parse(mem.get('long-run-home.v1')).order, STAGES.map((st) => st.id));
+  assert.deepEqual(load().progress.adult.stars, s.progress.adult.stars);
+  delete globalThis.localStorage;
+});

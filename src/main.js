@@ -27,7 +27,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 const ENDLESS = STAGES.length;
 const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
 const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
-const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty', 'thirty-one', 'thirty-two', 'thirty-three', 'thirty-four', 'thirty-five', 'thirty-six'];
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty', 'thirty-one', 'thirty-two', 'thirty-three', 'thirty-four', 'thirty-five', 'thirty-six', 'thirty-seven', 'thirty-eight', 'thirty-nine'];
 
 const app = {
   screen: 'title',
@@ -594,40 +594,34 @@ function showEndlessResults() {
 
 const ENDINGS = [
   {
-    eyebrow: 'Stage six · Frozen Pass',
     title: 'Home.',
     text: (who) => `${who('kick', 'kicks')} the snow off at the cabin door. The kettle is already on. Six places, one long day, and the light in the window was worth every step.`,
     note: 'A postcard is waiting on the mat: chapter two is open. And the long way round is endless now.',
   },
   {
-    eyebrow: 'Stage twelve · Lantern Festival',
     title: 'Worth the trip.',
     text: (who) => `${who('find', 'finds')} the spot by the river that somebody kept, just as the first fireworks go up. Sand, rain, ruins, canals, that enormous sun and now the lanterns: six postcards, and every one of them worth the run.`,
     note: 'Another postcard, this one with a star drawn on it: chapter three is open.',
   },
   {
-    eyebrow: 'Stage eighteen · Starlight Summit',
-    title: 'The top of the world.',
-    text: (who) => `${who('reach', 'reaches')} the blanket by the observatory just as the sky starts to fall: one shooting star, then ten, then too many to count. Blossom, lavender, fire, cloud, maple and stars. That was the long way, and it was worth all of it.`,
+    title: 'The long way down.',
+    text: (who) => `${who('run', 'runs')} the last of the path down to the lake, where the water is so clear and so blue it does not look real, and somebody is already in it. Blossom, lavender, fire, cloud, maple, a night of falling stars, the cows, the cliff and now this. That was the long way, and it was worth all of it.`,
     note: 'A last postcard, smelling of salt and woodsmoke: chapter four is open.',
   },
   {
-    eyebrow: 'Stage twenty-four · Bonfire Point',
     title: 'Everyone, together.',
-    text: (who) => `${who('run', 'runs')} the last stretch of sand to the fire, where everybody is already waiting with a blanket and a spare marshmallow. The lighthouse goes round. Salt, sea, mangroves, caves, the village and now this. Twenty-four places, and every one of them led here.`,
+    text: (who) => `${who('run', 'runs')} the last stretch of sand to the fire, where everybody is already waiting with a blanket and a spare marshmallow. The lighthouse goes round. Salt, sea, mangroves, caves, the village and now this. Twenty-seven places, and every one of them led here.`,
     note: 'One more postcard, in a hand you know: come home. Chapter five is open.',
   },
   {
-    eyebrow: 'Stage thirty · Home Again',
     title: 'Home again.',
-    text: (who) => `${who('come', 'comes')} up the same path as the very first morning. The porch lights are on, the table is laid outside, and the door is open. Steam, bamboo, painted hills, tulips, the glacier, and home. Thirty places, and the best one was here all along.`,
+    text: (who) => `${who('come', 'comes')} up the same path as the very first morning. The porch lights are on, the table is laid outside, and the door is open. Steam, bamboo, painted hills, tulips, the glacier, and home. Thirty-three places, and the best one was here all along.`,
     note: 'Then a poster, pinned to the gate: the harvest fair, three valleys over. Chapter six is open.',
   },
   {
-    eyebrow: 'Stage thirty-six · The Harvest Fair',
     title: 'All the lights of the fair.',
-    text: (who) => `${who('run', 'runs')} in under the arch just as the big wheel lights up all at once. There are toffee apples, a band organ playing, and fireworks over the field. Pumpkins, the mill, the moor, the viaduct, the vines, and now the fair. Thirty-six places, and the year still turning.`,
-    note: 'That is every stage. The long way round still goes on and on, through all thirty-six places.',
+    text: (who) => `${who('run', 'runs')} in under the arch just as the big wheel lights up all at once. There are toffee apples, a band organ playing, and fireworks over the field. Pumpkins, the mill, the moor, the viaduct, the vines, and now the fair. Thirty-nine places, and the year still turning.`,
+    note: `That is every stage. The long way round still goes on and on, through all ${NUM_WORDS[STAGES.length]} places.`,
   },
 ];
 
@@ -637,7 +631,8 @@ function showEnding(s, chapter = 0) {
   const t = runningTeam();
   const e = ENDINGS[chapter] || ENDINGS[0];
   const subject = (plural, single) => (t.length > 1 ? `${nameOf(t[0])} and ${nameOf(t[1])} ${plural}` : `${nameOf(t[0])} ${single}`);
-  $('end-eyebrow').textContent = e.eyebrow;
+  const last = CHAPTERS[chapter] ? CHAPTERS[chapter].to : 0;
+  $('end-eyebrow').textContent = `Stage ${NUM_WORDS[last + 1]} · ${STAGES[last].name}`;
   $('end-title').textContent = e.title;
   $('end-text').textContent = e.text(subject);
   $('end-note').textContent = e.note;

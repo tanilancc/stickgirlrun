@@ -4,6 +4,7 @@
 
 import { WORLD_STAGES } from './stages-world.js';
 import { SKY_STAGES } from './stages-skies.js';
+import { ALPINE_STAGES } from './stages-alpine.js';
 import { SEA_STAGES } from './stages-sea.js';
 import { RETURN_STAGES } from './stages-return.js';
 import { FAIR_STAGES } from './stages-fair.js';
@@ -260,37 +261,31 @@ const HOME_STAGES = [
   },
 ];
 
-export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES, ...SEA_STAGES, ...RETURN_STAGES, ...FAIR_STAGES];
+export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES, ...ALPINE_STAGES, ...SEA_STAGES, ...RETURN_STAGES, ...FAIR_STAGES];
 
 /** Chapters group stages on the map; the last stage of each has its own ending. */
-export const CHAPTERS = [
-  { name: 'The Long Run Home', subtitle: 'One day, six places, one cabin', from: 0, to: HOME_STAGES.length - 1 },
-  { name: 'Postcards from Away', subtitle: 'Six places round the world', from: HOME_STAGES.length, to: HOME_STAGES.length + WORLD_STAGES.length - 1 },
-  {
-    name: 'Under Open Skies',
-    subtitle: 'Six wild places, and a night of falling stars',
-    from: HOME_STAGES.length + WORLD_STAGES.length,
-    to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length - 1,
-  },
-  {
-    name: 'Down to the Sea',
-    subtitle: 'Six shores, and a fire on the beach',
-    from: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length,
-    to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length - 1,
-  },
-  {
-    name: 'Home Again',
-    subtitle: 'Six last places, and the porch light on',
-    from: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length,
-    to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length + RETURN_STAGES.length - 1,
-  },
-  {
-    name: 'The Harvest Fair',
-    subtitle: 'Six autumn places, and the lights of the fair',
-    from: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length + RETURN_STAGES.length,
-    to: HOME_STAGES.length + WORLD_STAGES.length + SKY_STAGES.length + SEA_STAGES.length + RETURN_STAGES.length + FAIR_STAGES.length - 1,
-  },
+const PARTS = [
+  { name: 'The Long Run Home', subtitle: 'One day, six places, one cabin', stages: HOME_STAGES },
+  { name: 'Postcards from Away', subtitle: 'Six places round the world', stages: WORLD_STAGES },
+  { name: 'Under Open Skies', subtitle: 'Nine wild places, a night of falling stars, and the long way down', stages: [...SKY_STAGES, ...ALPINE_STAGES] },
+  { name: 'Down to the Sea', subtitle: 'Six shores, and a fire on the beach', stages: SEA_STAGES },
+  { name: 'Home Again', subtitle: 'Six last places, and the porch light on', stages: RETURN_STAGES },
+  { name: 'The Harvest Fair', subtitle: 'Six autumn places, and the lights of the fair', stages: FAIR_STAGES },
 ];
+
+/** Chapters as runs of stage indices; each one ends on its own ending screen. */
+export const CHAPTERS = [];
+for (let i = 0, from = 0; i < PARTS.length; i++) {
+  const { name, subtitle, stages } = PARTS[i];
+  CHAPTERS.push({ name, subtitle, from, to: from + stages.length - 1 });
+  from += stages.length;
+}
+
+/**
+ * Stages added in the middle of the game after people already had saves, oldest first. A save
+ * without a stage order was made before these existed; see storage.js.
+ */
+export const INSERTED_STAGES = ALPINE_STAGES.map((s) => s.id);
 
 /** Everyone who can run lives in cast.js; CHARACTERS is kept as the old name for it. */
 export { ROSTER as CHARACTERS } from './cast.js';

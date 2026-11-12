@@ -11,6 +11,7 @@ import { SKY_SEG, skyPit, SKY_OB, skyRoller, skyDrop, SKY_DECOR, skyForeground, 
 import { SEA_SEG, SEA_WATERY, seaPit, SEA_OB, seaRoller, seaSwing, seaDrop, SEA_DECOR, seaForeground, drawBonfire } from './art-sea.js';
 import { RETURN_SEG, returnPit, RETURN_OB, returnSwing, RETURN_DECOR, returnForeground, drawHomeCabin } from './art-return.js';
 import { ALPINE_SEG, alpinePit, ALPINE_OB, alpineForeground, drawLakeHouse } from './art-alpine.js';
+import { WINTER_SEG, winterPit, WINTER_OB, winterRoller, WINTER_DECOR, winterForeground, drawMidwinterTree } from './art-winter.js';
 import { FAIR_SEG, fairPit, FAIR_OB, fairRoller, fairSwing, fairDrop, FAIR_DECOR, fairForeground, drawFairGate } from './art-fair.js';
 
 const watery = (terr) => WATERY.has(terr) || SEA_WATERY.has(terr);
@@ -112,7 +113,7 @@ export function drawTerrain(ctx, L, look, view, cam, t) {
     const sx0 = Math.max(s.x0, x0);
     const sx1 = Math.min(s.x1, x1);
     const k = look(s.th);
-    (SEG[k.st.terrain] || WORLD_SEG[k.st.terrain] || SKY_SEG[k.st.terrain] || SEA_SEG[k.st.terrain] || RETURN_SEG[k.st.terrain] || FAIR_SEG[k.st.terrain] || ALPINE_SEG[k.st.terrain])(ctx, s, sx0, sx1, bottom, k.P, k.T, t, openL, openR);
+    (SEG[k.st.terrain] || WORLD_SEG[k.st.terrain] || SKY_SEG[k.st.terrain] || SEA_SEG[k.st.terrain] || RETURN_SEG[k.st.terrain] || FAIR_SEG[k.st.terrain] || ALPINE_SEG[k.st.terrain] || WINTER_SEG[k.st.terrain])(ctx, s, sx0, sx1, bottom, k.P, k.T, t, openL, openR);
   }
 }
 
@@ -145,7 +146,7 @@ function drawPit(ctx, terr, P, T, a, b, bottom, t) {
   const top = Math.max(a.y, b.y) + 1;
   const x0 = a.x1;
   const w = b.x0 - a.x1;
-  if (worldPit(ctx, terr, P, T, a, b, bottom, t) || skyPit(ctx, terr, P, T, a, b, bottom, t) || seaPit(ctx, terr, P, T, a, b, bottom, t) || returnPit(ctx, terr, P, T, a, b, bottom, t) || fairPit(ctx, terr, P, T, a, b, bottom, t) || alpinePit(ctx, terr, P, T, a, b, bottom, t)) return;
+  if (worldPit(ctx, terr, P, T, a, b, bottom, t) || skyPit(ctx, terr, P, T, a, b, bottom, t) || seaPit(ctx, terr, P, T, a, b, bottom, t) || returnPit(ctx, terr, P, T, a, b, bottom, t) || fairPit(ctx, terr, P, T, a, b, bottom, t) || alpinePit(ctx, terr, P, T, a, b, bottom, t) || winterPit(ctx, terr, P, T, a, b, bottom, t)) return;
   if (terr === 'meadow' || terr === 'forest') {
     ctx.fillStyle = vg(ctx, top, top + 120, T(mix(P.ground.body, '#000000', 0.35)), T(P.ground.deep));
     ctx.fillRect(x0, top, w, bottom - top);
@@ -1005,7 +1006,7 @@ export function drawObstacles(ctx, L, look, view, cam, t) {
     const o = obs[i];
     if (o.x > x1) break;
     if (o.x + o.w < x0) continue;
-    const f = OB[o.skin] || WORLD_OB[o.skin] || SKY_OB[o.skin] || SEA_OB[o.skin] || RETURN_OB[o.skin] || FAIR_OB[o.skin] || ALPINE_OB[o.skin];
+    const f = OB[o.skin] || WORLD_OB[o.skin] || SKY_OB[o.skin] || SEA_OB[o.skin] || RETURN_OB[o.skin] || FAIR_OB[o.skin] || ALPINE_OB[o.skin] || WINTER_OB[o.skin];
     if (!f) continue;
     const k = look(o.th);
     f(ctx, o, k.T, k.P, t, k.st);
@@ -1038,7 +1039,7 @@ function drawRoller(ctx, m, s, T, P) {
   ctx.ellipse(0, r - 1, r * 0.9, 3, 0, 0, TAU);
   ctx.fill();
   ctx.rotate(rot);
-  if (worldRoller(ctx, m, r, T, P) || skyRoller(ctx, m, r, T, P) || seaRoller(ctx, m, r, T, P) || fairRoller(ctx, m, r, T, P)) {
+  if (worldRoller(ctx, m, r, T, P) || skyRoller(ctx, m, r, T, P) || seaRoller(ctx, m, r, T, P) || fairRoller(ctx, m, r, T, P) || winterRoller(ctx, m, r, T, P)) {
     /* chapter 2 skins */
   } else if (m.skin === 'hayroll') {
     ctx.fillStyle = T('#d9b466');
@@ -1424,7 +1425,7 @@ export function drawDecor(ctx, L, look, view, cam) {
   for (let i = lowerBound(dec, x0); i < dec.length; i++) {
     const d = dec[i];
     if (d.x > x1) break;
-    const f = DECOR[d.skin] || WORLD_DECOR[d.skin] || SKY_DECOR[d.skin] || SEA_DECOR[d.skin] || RETURN_DECOR[d.skin] || FAIR_DECOR[d.skin];
+    const f = DECOR[d.skin] || WORLD_DECOR[d.skin] || SKY_DECOR[d.skin] || SEA_DECOR[d.skin] || RETURN_DECOR[d.skin] || FAIR_DECOR[d.skin] || WINTER_DECOR[d.skin];
     if (!f) continue;
     const k = look(d.th);
     f(ctx, d, k.T, k.P);
@@ -1582,6 +1583,8 @@ export function drawFinish(ctx, L, stage, P, T, t, open) {
     drawHomeCabin(ctx, x + 380, y, T, P, t, open);
   } else if (stage.id === 'lake') {
     drawLakeHouse(ctx, x + 380, y, T, P, t, open);
+  } else if (stage.id === 'square') {
+    drawMidwinterTree(ctx, x + 420, y, T, P, t, open);
   } else if (stage.id === 'fair') {
     drawFairGate(ctx, x + 420, y, T, P, t, open);
   }
@@ -1700,7 +1703,7 @@ export function buildForeground(stage) {
   g.lineCap = 'round';
   for (let x = 60; x < W - 60; x += 380 + rng() * 520) {
     const kind = stage.terrain;
-    if (worldForeground(g, kind, x, H, rng) || skyForeground(g, kind, x, H, rng) || seaForeground(g, kind, x, H, rng) || returnForeground(g, kind, x, H, rng) || fairForeground(g, kind, x, H, rng) || alpineForeground(g, kind, x, H, rng)) {
+    if (worldForeground(g, kind, x, H, rng) || skyForeground(g, kind, x, H, rng) || seaForeground(g, kind, x, H, rng) || returnForeground(g, kind, x, H, rng) || fairForeground(g, kind, x, H, rng) || alpineForeground(g, kind, x, H, rng) || winterForeground(g, kind, x, H, rng)) {
       /* chapter 2 kinds */
     } else if (kind === 'meadow' || kind === 'forest') {
       for (let k = 0; k < 18; k++) {

@@ -27,7 +27,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 const ENDLESS = STAGES.length;
 const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
 const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
-const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty', 'thirty-one', 'thirty-two', 'thirty-three', 'thirty-four', 'thirty-five', 'thirty-six', 'thirty-seven', 'thirty-eight', 'thirty-nine'];
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty', 'thirty-one', 'thirty-two', 'thirty-three', 'thirty-four', 'thirty-five', 'thirty-six', 'thirty-seven', 'thirty-eight', 'thirty-nine', 'forty', 'forty-one', 'forty-two', 'forty-three', 'forty-four', 'forty-five'];
 
 const app = {
   screen: 'title',
@@ -621,6 +621,11 @@ const ENDINGS = [
   {
     title: 'All the lights of the fair.',
     text: (who) => `${who('run', 'runs')} in under the arch just as the big wheel lights up all at once. There are toffee apples, a band organ playing, and fireworks over the field. Pumpkins, the mill, the moor, the viaduct, the vines, and now the fair. Thirty-nine places, and the year still turning.`,
+    note: 'In the morning there is snow on the window sill, and it is still falling. Chapter seven is open.',
+  },
+  {
+    title: 'The longest night.',
+    text: (who) => `${who('make', 'makes')} it into the square just as the countdown reaches one, and every light on the great tree comes on at once. Somebody hands over a cup of something hot. Birches, the lake, the reindeer, the ski hill, the sculptures, and the whole town together. Forty-five places, and the days start getting longer from here.`,
     note: `That is every stage. The long way round still goes on and on, through all ${NUM_WORDS[STAGES.length]} places.`,
   },
 ];

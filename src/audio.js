@@ -481,6 +481,53 @@ export class AudioEngine {
         this.tone({ t, f: 420, f2: 390, a: 0.05, d: 0.4, g: 0.02, dest: this.ambBus });
         this.tone({ t: t + 0.55, f: 410, f2: 380, a: 0.05, d: 0.6, g: 0.02, dest: this.ambBus });
       });
+    } else if (id === 'birchwood') {
+      // the hush after snow: a little wind, snow sliding off a branch, a woodpecker
+      this.loopNoise('lowpass', 380, 0.5, 0.03, { rate: 0.05, depth: 140, target: 'freq' });
+      this.every(5, 10, () => this.noiseHit({ type: 'lowpass', f: 900, q: 0.5, a: 0.05, d: 0.6, g: 0.03, dest: this.ambBus, pan: Math.random() * 1.4 - 0.7 }));
+      this.every(9, 16, () => {
+        const t = this.ctx.currentTime;
+        for (let k = 0; k < 12; k++) this.noiseHit({ t: t + k * 0.05, f: 1400, q: 5, d: 0.02, g: 0.03, dest: this.ambBus, pan: 0.5 });
+      });
+    } else if (id === 'icelake') {
+      // skates hissing on the ice, children shouting far off, the ice booming now and then
+      this.loopNoise('highpass', 3000, 0.4, 0.02, { rate: 0.6, depth: 0.015, target: 'gain' });
+      this.loopNoise('bandpass', 800, 0.8, 0.025, { rate: 0.2, depth: 200, target: 'freq' });
+      this.every(8, 16, () => this.tone({ type: 'sine', f: 180, f2: 60, a: 0.01, d: 1.2, g: 0.03, dest: this.ambBus }));
+    } else if (id === 'tundra') {
+      // a cold wind over open snow, reindeer bells, and the fire crackling at the camp
+      this.loopNoise('bandpass', 560, 3, 0.06, { rate: 0.06, depth: 220, target: 'freq' });
+      this.every(1.5, 4, () => {
+        const t = this.ctx.currentTime;
+        for (let k = 0; k < 3; k++) this.tone({ t: t + k * 0.14, type: 'triangle', f: 1500 + Math.random() * 300, d: 0.25, g: 0.006, dest: this.ambBus });
+      });
+      this.every(0.3, 1.2, () => this.noiseHit({ f: 3000, q: 2, d: 0.02, g: 0.012, dest: this.ambBus, pan: -0.3 }));
+    } else if (id === 'skihill') {
+      // the lift humming and clanking over each tower, skis carving past
+      this.loopNoise('lowpass', 140, 0.6, 0.04);
+      this.every(3, 5, () => this.tone({ type: 'square', f: 90, f2: 70, d: 0.08, g: 0.01, dest: this.ambBus }));
+      this.every(4, 9, () => this.noiseHit({ type: 'highpass', f: 2200, q: 0.5, a: 0.2, d: 0.6, g: 0.025, dest: this.ambBus, pan: Math.random() * 1.4 - 0.7 }));
+    } else if (id === 'sculptures') {
+      // a hushed crowd, and a glass harmonica somewhere among the ice
+      this.loopNoise('bandpass', 600, 0.8, 0.025, { rate: 0.1, depth: 150, target: 'freq' });
+      this.every(1.4, 3, () => {
+        const f = [784, 880, 988, 1175, 1319][Math.floor(Math.random() * 5)];
+        this.tone({ type: 'sine', f, a: 0.15, d: 1.6, g: 0.008, dest: this.ambBus });
+      });
+    } else if (id === 'square') {
+      // the crowd in the square, bells from the church, and carols carried on the cold
+      this.loopNoise('bandpass', 700, 0.8, 0.05, { rate: 0.2, depth: 200, target: 'freq' });
+      this.every(10, 18, () => {
+        const t = this.ctx.currentTime;
+        [659, 587, 523, 392].forEach((f, k) => this.tone({ t: t + k * 0.6, type: 'sine', f, d: 2.4, g: 0.012, dest: this.ambBus }));
+      });
+      const carol = [67, 67, 69, 67, 72, 71, 0, 0, 67, 67, 69, 67, 74, 72, 0, 0];
+      let i = 0;
+      this.every(0.42, 0.43, () => {
+        const n = carol[i++ % carol.length];
+        if (!n) return;
+        this.tone({ type: 'triangle', f: 440 * Math.pow(2, (n - 69) / 12), a: 0.06, d: 0.4, g: 0.005, dest: this.ambBus });
+      });
     } else if (id === 'pasture') {
       // cowbells all over the hillside, near and far, and larks
       this.loopNoise('lowpass', 460, 0.5, 0.035, { rate: 0.07, depth: 180, target: 'freq' });

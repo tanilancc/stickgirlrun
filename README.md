@@ -6,7 +6,8 @@ mountain pass at dawn. Then a postcard arrives, and chapter two takes them round
 more. Chapter three climbs through wild places to a summit under falling stars and down the other
 side to a turquoise lake, and chapter four runs down to the sea, ending at a bonfire on the beach. Chapter five brings them home again,
 to the same cabin on a summer evening, and chapter six follows a poster on the gate to the harvest
-fair, three valleys over. The long way round is an endless road through all thirty-nine. It plays
+fair, three valleys over. Chapter seven brings the first snow, and ends in the town square on
+midwinter night. The long way round is an endless road through all forty-five. It plays
 on desktop (keyboard or gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
 faster **Teen / Adult** mode.
 
@@ -183,6 +184,31 @@ viaduct, and thistledown blows across the moor. At the end the big wheel lights 
 
 ![All the lights of the fair](docs/screenshots/harvest-fair-ending.jpg)
 
+## Chapter seven: First Snow
+
+The morning after the fair it snows. Six winter places lead to the town square on the longest
+night of the year, where the great tree is about to be lit.
+
+| # | Stage | Time of day | What gets in your way |
+|---|-------|-------------|-----------------------|
+| 40 | Birch Wood | frosty morning | loaded sledges, snowy logs, holly, a birch bowed over by snow, a deer feeding rack, rolling snowballs |
+| 41 | Skating Lake | bright noon | skate benches, fishing holes behind flags, ice blocks, bunting, fishing huts, holes in the ice |
+| 42 | Reindeer Road | polar night, northern lights | sledges, reindeer corrals, drifts, fish drying racks, a herder's cargo sled |
+| 43 | Ski Hill | blue afternoon | snowmen, ski racks, the start gate, a piste groomer, rolling snowballs |
+| 44 | Snow Sculpture Park | dusk | blocks of snow, ice crystals lit blue, a snow bridge, a snow castle, rolling balls of glowing ice |
+| 45 | Midwinter Square | longest night | presents, sledges, holly, garlands of lights, a chestnut cart, then the great tree |
+
+| | |
+|---|---|
+| ![Birch Wood](docs/screenshots/birch-wood.jpg) | ![Skating Lake](docs/screenshots/skating-lake.jpg) |
+| ![Reindeer Road](docs/screenshots/reindeer-road.jpg) | ![Ski Hill](docs/screenshots/ski-hill.jpg) |
+| ![Snow Sculpture Park](docs/screenshots/snow-sculpture-park.jpg) | ![Midwinter Square](docs/screenshots/midwinter-square.jpg) |
+
+Skaters go round on the lake, the chairlift carries people up the ski hill, the northern lights
+move over the reindeer road, and when you reach the square every light on the tree comes on:
+
+![The longest night](docs/screenshots/the-longest-night.jpg)
+
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
@@ -210,7 +236,7 @@ pair first, then random pairs from the cast.
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
-ending screens. It is one unbroken road through all thirty-nine landscapes, in order, over and over:
+ending screens. It is one unbroken road through all forty-five landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -278,7 +304,7 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all thirty-nine landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+all forty-five landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
 also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
@@ -299,6 +325,7 @@ src/stages-alpine.js        chapter three, the long way down
 src/stages-sea.js           chapter four, down to the sea
 src/stages-return.js        chapter five, home again
 src/stages-fair.js          chapter six, the harvest fair
+src/stages-winter.js        chapter seven, first snow
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
@@ -313,6 +340,7 @@ src/backgrounds-alpine.js   the way down: pasture, gorge and waterfall, the lake
 src/backgrounds-sea.js      chapter four landscapes, reflections
 src/backgrounds-return.js   chapter five landscapes
 src/backgrounds-fair.js     chapter six landscapes, mill wheel, train, big wheel
+src/backgrounds-winter.js   chapter seven landscapes, skaters, chairlift, the great tree
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
 src/art-world.js            chapter two ground, props, movers, decor, pavilion
 src/art-skies.js            chapter three ground, props, movers, decor, observatory
@@ -320,6 +348,7 @@ src/art-alpine.js           the way down: ground, props, the boathouse
 src/art-sea.js              chapter four ground, props, movers, decor, bonfire
 src/art-return.js           chapter five ground, props, decor, the cabin in summer
 src/art-fair.js             chapter six ground, props, movers, decor, the fair gate
+src/art-winter.js           chapter seven ground, props, decor, the tree lighting
 src/fx.js                   particles, weather, grade/vignette/grain
 src/renderer.js             camera + frame composition
 src/audio.js                synthesized sound and music

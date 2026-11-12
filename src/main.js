@@ -27,7 +27,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in win
 const ENDLESS = STAGES.length;
 const chapterOf = (i) => CHAPTERS.findIndex((c) => i >= c.from && i <= c.to);
 const endsChapter = (i) => CHAPTERS.some((c) => c.to === i);
-const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty', 'thirty-one', 'thirty-two', 'thirty-three', 'thirty-four', 'thirty-five', 'thirty-six', 'thirty-seven', 'thirty-eight', 'thirty-nine', 'forty', 'forty-one', 'forty-two', 'forty-three', 'forty-four', 'forty-five'];
+const NUM_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four', 'twenty-five', 'twenty-six', 'twenty-seven', 'twenty-eight', 'twenty-nine', 'thirty', 'thirty-one', 'thirty-two', 'thirty-three', 'thirty-four', 'thirty-five', 'thirty-six', 'thirty-seven', 'thirty-eight', 'thirty-nine', 'forty', 'forty-one', 'forty-two', 'forty-three', 'forty-four', 'forty-five', 'forty-six', 'forty-seven', 'forty-eight', 'forty-nine', 'fifty', 'fifty-one'];
 
 const app = {
   screen: 'title',
@@ -626,6 +626,11 @@ const ENDINGS = [
   {
     title: 'The longest night.',
     text: (who) => `${who('make', 'makes')} it into the square just as the countdown reaches one, and every light on the great tree comes on at once. Somebody hands over a cup of something hot. Birches, the lake, the reindeer, the ski hill, the sculptures, and the whole town together. Forty-five places, and the days start getting longer from here.`,
+    note: 'Spring at last, and a kite arrives in the post with a map drawn on it. Chapter eight is open.',
+  },
+  {
+    title: 'A sky full of kites.',
+    text: (who) => `${who('reach', 'reaches')} the top of the hill just as the great dragon kite lifts off, and somebody puts the string in their hands. Balloons, the river, the steppe, the pass, the stepwells, and now this. Fifty-one places, and the whole sky to fly in.`,
     note: `That is every stage. The long way round still goes on and on, through all ${NUM_WORDS[STAGES.length]} places.`,
   },
 ];

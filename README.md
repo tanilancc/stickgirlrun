@@ -7,7 +7,8 @@ more. Chapter three climbs through wild places to a summit under falling stars a
 side to a turquoise lake, and chapter four runs down to the sea, ending at a bonfire on the beach. Chapter five brings them home again,
 to the same cabin on a summer evening, and chapter six follows a poster on the gate to the harvest
 fair, three valleys over. Chapter seven brings the first snow, and ends in the town square on
-midwinter night. The long way round is an endless road through all forty-five. It plays
+midwinter night, and chapter eight follows a kite east to a festival by the sea. The long way
+round is an endless road through all fifty-one. It plays
 on desktop (keyboard or gamepad) and on phones (touch). One or two players can play, in a gentle **Kids** mode or a
 faster **Teen / Adult** mode.
 
@@ -209,6 +210,31 @@ move over the reindeer road, and when you reach the square every light on the tr
 
 ![The longest night](docs/screenshots/the-longest-night.jpg)
 
+## Chapter eight: Where the Kites Fly
+
+Spring at last, and a kite arrives in the post with a map drawn on it. Six places east lead to a
+kite festival on a hill above the sea.
+
+| # | Stage | Time of day | What gets in your way |
+|---|-------|-------------|-----------------------|
+| 46 | Balloon Valley | sunrise | balloon baskets, stone chimneys, a balloon lifting off over the path, cave houses, rolling boulders |
+| 47 | Karst River | misty morning | bamboo rafts, cormorant perches, baskets, a woven awning, limestone pillars, the river |
+| 48 | Endless Steppe | windy noon | rolls of felt, a cairn hung with blue scarves, a painted gateway, a yurt packed on a cart, tumbleweed |
+| 49 | Prayer Flag Pass | thin-air afternoon | prayer wheels, mani stones, strings of prayer flags, white monastery walls, rolling boulders |
+| 50 | Stepwell City | golden hour | water pots, cactus, a carved arch, stone pavilions, stepwells, rolling brass pots |
+| 51 | Kite Hill | spring evening | reels of string, half-built kites, a line of kites across the path, a kite stall, then the dragon kite |
+
+| | |
+|---|---|
+| ![Balloon Valley](docs/screenshots/balloon-valley.jpg) | ![Karst River](docs/screenshots/karst-river.jpg) |
+| ![Endless Steppe](docs/screenshots/endless-steppe.jpg) | ![Prayer Flag Pass](docs/screenshots/prayer-flag-pass.jpg) |
+| ![Stepwell City](docs/screenshots/stepwell-city.jpg) | ![Kite Hill](docs/screenshots/kite-hill.jpg) |
+
+Balloons drift up over the valley, prayer flags snap in the wind and the sky over the last hill is
+full of kites. At the top, the great dragon kite goes up:
+
+![A sky full of kites](docs/screenshots/a-sky-full-of-kites.jpg)
+
 Each stage is hand-tuned data (palette, hazards, weather, music) fed to a seeded generator, so a
 stage is identical every time you play it and can be learned. Finish a stage to unlock the next.
 You earn up to three stars for coins collected and for running clean.
@@ -236,7 +262,7 @@ pair first, then random pairs from the cast.
 ## Endless: The Long Way Round
 
 Clearing stage 6 opens the endless postcard on the map, and a **Keep running** button on the
-ending screens. It is one unbroken road through all forty-five landscapes, in order, over and over:
+ending screens. It is one unbroken road through all fifty-one landscapes, in order, over and over:
 
 ![Crossing from the meadow into the pines](docs/screenshots/endless-crossing.jpg)
 
@@ -304,7 +330,7 @@ trails follow the exact path of a full jump, so they double as a hint for when t
 `tests/autopilot.test.js` drives an autopilot through **every stage on both difficulties** and
 requires it to finish with **zero hits and zero falls**. `tests/endless.test.js` does the same for
 more than one full lap of the endless road, and checks that it is deterministic, cycles through
-all forty-five landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
+all fifty-one landscapes, keeps every gap jumpable and keeps memory flat. `tests/level.test.js`
 also checks that every stage only names props that exist. The autopilot does not know the level:
 it simulates candidate button presses with the same physics the player gets. So the generator can
 never ship an impossible sequence. The same autopilot runs the title-screen attract mode.
@@ -326,6 +352,7 @@ src/stages-sea.js           chapter four, down to the sea
 src/stages-return.js        chapter five, home again
 src/stages-fair.js          chapter six, the harvest fair
 src/stages-winter.js        chapter seven, first snow
+src/stages-kites.js         chapter eight, where the kites fly
 src/level.js                seeded level generator + spatial queries   (pure, tested)
 src/runner.js               runner physics                              (pure, tested)
 src/bot.js                  simulation-based autopilot                  (tested)
@@ -341,6 +368,7 @@ src/backgrounds-sea.js      chapter four landscapes, reflections
 src/backgrounds-return.js   chapter five landscapes
 src/backgrounds-fair.js     chapter six landscapes, mill wheel, train, big wheel
 src/backgrounds-winter.js   chapter seven landscapes, skaters, chairlift, the great tree
+src/backgrounds-kites.js    chapter eight landscapes, balloons, kites, prayer flags
 src/art.js                  ground, obstacles, movers, decor, coins, finish, cabin
 src/art-world.js            chapter two ground, props, movers, decor, pavilion
 src/art-skies.js            chapter three ground, props, movers, decor, observatory
@@ -349,6 +377,7 @@ src/art-sea.js              chapter four ground, props, movers, decor, bonfire
 src/art-return.js           chapter five ground, props, decor, the cabin in summer
 src/art-fair.js             chapter six ground, props, movers, decor, the fair gate
 src/art-winter.js           chapter seven ground, props, decor, the tree lighting
+src/art-kites.js            chapter eight ground, props, rollers, the dragon kite
 src/fx.js                   particles, weather, grade/vignette/grain
 src/renderer.js             camera + frame composition
 src/audio.js                synthesized sound and music

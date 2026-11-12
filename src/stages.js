@@ -9,6 +9,7 @@ import { SEA_STAGES } from './stages-sea.js';
 import { RETURN_STAGES } from './stages-return.js';
 import { FAIR_STAGES } from './stages-fair.js';
 import { WINTER_STAGES } from './stages-winter.js';
+import { KITE_STAGES } from './stages-kites.js';
 
 const HOME_STAGES = [
   {
@@ -262,7 +263,7 @@ const HOME_STAGES = [
   },
 ];
 
-export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES, ...ALPINE_STAGES, ...SEA_STAGES, ...RETURN_STAGES, ...FAIR_STAGES, ...WINTER_STAGES];
+export const STAGES = [...HOME_STAGES, ...WORLD_STAGES, ...SKY_STAGES, ...ALPINE_STAGES, ...SEA_STAGES, ...RETURN_STAGES, ...FAIR_STAGES, ...WINTER_STAGES, ...KITE_STAGES];
 
 /** Chapters group stages on the map; the last stage of each has its own ending. */
 const PARTS = [
@@ -273,6 +274,7 @@ const PARTS = [
   { name: 'Home Again', subtitle: 'Six last places, and the porch light on', stages: RETURN_STAGES },
   { name: 'The Harvest Fair', subtitle: 'Six autumn places, and the lights of the fair', stages: FAIR_STAGES },
   { name: 'First Snow', subtitle: 'Six winter places, and the longest night', stages: WINTER_STAGES },
+  { name: 'Where the Kites Fly', subtitle: 'Six places east, and a sky full of kites', stages: KITE_STAGES },
 ];
 
 /** Chapters as runs of stage indices; each one ends on its own ending screen. */

@@ -19,6 +19,7 @@ const DUST = {
   geyser: '#f0e8d8', bamboo: '#b0a070', rainbow: '#e8b080', tulips: '#a89070', glacier: '#ffffff', home: '#cdb89a',
   pasture: '#b8a878', cliffpath: '#a8a8a8', lake: '#d8d0c0',
   birchwood: '#ffffff', icelake: '#ffffff', tundra: '#e0e8f4', skihill: '#ffffff', sculptures: '#f0f4ff', square: '#e8ecf4',
+  chimneys: '#e8d0b0', karst: '#a8a070', steppe: '#c8b880', monastery: '#c8b898', stepwell: '#f0c890', kites: '#b8a878',
   pumpkin: '#b8a888', mill: '#a89060', moor: '#8a7a6a', viaduct: '#c8bca8', vineyard: '#d8b080', fair: '#a89a70',
 };
 /** Surfaces that throw up water instead of (or as well as) dust. */

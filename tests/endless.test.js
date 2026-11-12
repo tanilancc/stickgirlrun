@@ -76,7 +76,8 @@ for (const diffId of ['kids', 'adult']) {
     });
     const goal = LEG * (STAGES.length + 0.5);
     let steps = 0;
-    while (w.d < goal && w.status === 'run' && steps < 1200 / DT) {
+    // time budget grows with the road: no slower than 300 units a second on average
+    while (w.d < goal && w.status === 'run' && steps < goal / 300 / DT) {
       w.update(DT);
       steps++;
     }

@@ -2,16 +2,19 @@
 // storage simply fall back to an in-memory state so the game always runs.
 
 import { ROSTER, DEFAULT_TEAM } from './cast.js';
-import { STAGES as ALL_STAGES } from './stages.js';
+import { STAGES as ALL_STAGES, INSERTED_STAGES } from './stages.js';
 
 const KEY = 'long-run-home.v1';
 const STAGES = ALL_STAGES.length;
+const IDS = ALL_STAGES.map((s) => s.id);
+/** The order saves were made in before any stage was added mid-game (they hold no order). */
+const LEGACY_IDS = IDS.filter((id) => !INSERTED_STAGES.includes(id));
 const CHAPTER_ONE = 6;
 
 function defaults() {
   const track = () => ({ unlocked: 1, stars: Array(STAGES).fill(0), coins: Array(STAGES).fill(0), endlessBest: 0, endlessCoins: 0 });
   // runner: 'a' or 'b' (one of the two team slots running alone) or 'duo'
-  return { settings: { runner: 'a', team: [...DEFAULT_TEAM], names: {}, diff: 'kids', muted: false }, progress: { kids: track(), adult: track() } };
+  return { order: [...IDS], settings: { runner: 'a', team: [...DEFAULT_TEAM], names: {}, diff: 'kids', muted: false }, progress: { kids: track(), adult: track() } };
 }
 
 export function load() {
@@ -20,11 +23,20 @@ export function load() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return d;
     const s = JSON.parse(raw);
-    // Saves from before later chapters hold shorter arrays: pad them to the current length.
+    // Stars and coins are kept per stage, in the order the save was made in. Saves from before
+    // later chapters hold shorter arrays, and saves from before stages were added in the middle
+    // hold no order at all: map everything back onto the stages by id.
+    const order = Array.isArray(s.order) ? s.order : LEGACY_IDS;
+    const at = new Map(order.map((id, i) => [id, i]));
+    const pick = (arr, id) => (Array.isArray(arr) && at.has(id) ? arr[at.get(id)] || 0 : 0);
     const track = (def, saved = {}) => {
       const t = { ...def, ...saved };
-      t.stars = Array.from({ length: STAGES }, (_, i) => (saved.stars && saved.stars[i]) || 0);
-      t.coins = Array.from({ length: STAGES }, (_, i) => (saved.coins && saved.coins[i]) || 0);
+      t.stars = IDS.map((id) => pick(saved.stars, id));
+      t.coins = IDS.map((id) => pick(saved.coins, id));
+      // 'unlocked' counts stages open from the start; carry it over by the last stage it opened
+      const n = Math.max(1, Math.min(order.length, Number(saved.unlocked) || 1));
+      const last = IDS.indexOf(order[n - 1]);
+      t.unlocked = Math.max(1, Math.min(STAGES, last >= 0 ? last + 1 : 1));
       return t;
     };
     const settings = { ...d.settings, ...(s.settings || {}) };
@@ -36,6 +48,7 @@ export function load() {
     settings.team = team.length === 2 && team[0] !== team[1] ? team : [...DEFAULT_TEAM];
     settings.names = settings.names && typeof settings.names === 'object' ? settings.names : {};
     return {
+      order: [...IDS],
       settings,
       progress: {
         kids: track(d.progress.kids, s.progress?.kids),
@@ -48,6 +61,7 @@ export function load() {
 }
 
 export function save(state) {
+  state.order = [...IDS];
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
   } catch {

@@ -37,10 +37,17 @@ To remove Google entirely, self-host the three font families in `css/` (see Open
 None. The deploy uses GitHub's built-in, short-lived workflow token. No API keys exist.
 
 ## Legal pages
-- Privacy policy: **not yet written.** Because there is no collection, it can be one paragraph, based
-  on the inventory above, and must name GitHub Pages and Google Fonts. It should be added before
-  sharing the game widely with children.
-- Terms / refund policy: N/A, nothing is sold.
+- Privacy policy: [`privacy.html`](../privacy.html), linked from the title screen. Written from the
+  data inventory above: nothing collected, what localStorage holds and how to delete it, GitHub Pages
+  and Google Fonts named, children (COPPA, GDPR) covered, contact via GitHub issues.
+- Terms of use: [`terms.html`](../terms.html), linked from the title screen: free, parental
+  supervision, a flashing-lights warning, fair use, Apache-2.0 code, no warranty, contact.
+- Refund policy: N/A, nothing is sold (stated in the terms).
+- Both pages load nothing from outside (system fonts, inline styles).
+- **Not legal advice:** these were drafted from the facts of this codebase, not by a lawyer. Have them
+  reviewed before promoting the game to schools or children's platforms, and set a governing-law
+  clause in the terms once the owner's country is decided.
+- When the data inventory changes, update `privacy.html` and its effective date in the same commit.
 - License: Apache-2.0 (`LICENSE`).
 
 ## Open item

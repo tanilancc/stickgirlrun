@@ -38,9 +38,11 @@ both difficulties with **zero hits and zero falls** (`npm test`, run on every pu
 11. Chapter seven, First Snow (6 stages). Status: done
 12. Chapter eight, Where the Kites Fly (6 stages). Status: done
 13. `?unlock=all` to try any stage without playing through. Status: done
+14. Privacy policy and terms of use pages, linked from the title screen. Status: done
 
 ## Open questions
 - The real names for the eight cast runners: they show placeholders (Blue Shirt, Navy Polo, Braids,
   Curly, Headband, Tutu, Pinafore, Blue Dress) until the owner says which name goes with which figure,
   and whether real names may go in a public repo at all.
 - Should `?unlock=all` stay in the public build, or move behind a less guessable switch?
+- A lawyer's review of `privacy.html` and `terms.html`, and which country's law the terms should name.

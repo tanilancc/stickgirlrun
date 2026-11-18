@@ -31,6 +31,17 @@ npm start
 ```
 
 Then open <http://localhost:8080>. Any static server works too (`python3 -m http.server`).
+You need Node.js 22 or newer for `npm start` and `npm test`; there is nothing to `npm install`
+and no `.env` to configure.
+
+**Test:** `npm test` runs every suite, including the autopilot through all 51 stages on both
+difficulties (about a minute).
+
+**Try any stage without playing through:** add `?unlock=all` to the address, for example
+<https://tanilancc.github.io/stickgirlrun/?unlock=all> or <http://localhost:8080/?unlock=all>.
+It opens every stage and the endless road on both difficulties, keeps any stars already earned,
+and is saved in that browser, so it lasts after you take it off the address again. To start
+over, clear the site's data in the browser.
 
 ### Deployment
 
@@ -388,8 +399,15 @@ scripts/serve.mjs           zero-dependency static server
 tests/                      node:test suites
 ```
 
-The design notes are in
-[`docs/superpowers/specs/2026-11-08-long-run-home-design.md`](docs/superpowers/specs/2026-11-08-long-run-home-design.md).
+## Project docs
+
+- [`docs/PRD.md`](docs/PRD.md): who it is for, the goal, what it deliberately is not, and every slice.
+- [`docs/TSD.md`](docs/TSD.md): stack, architecture, the save format, testing and deployment.
+- [`docs/SECURITY.md`](docs/SECURITY.md): what data exists (only on the player's device), third
+  parties, threats and mitigations, with children as a core audience.
+- [`docs/DECISIONS.md`](docs/DECISIONS.md): the decision log.
+- [`docs/superpowers/specs/2026-11-08-long-run-home-design.md`](docs/superpowers/specs/2026-11-08-long-run-home-design.md):
+  the original design brief, kept as history.
 
 ## License
 

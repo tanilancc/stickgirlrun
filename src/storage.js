@@ -80,8 +80,31 @@ export function recordResult(state, diffId, stageIndex, stars, coins) {
   return p.unlocked > before;
 }
 
-/** The endless road opens once the sixth stage has been cleared on that difficulty. */
-export const endlessOpen = (state, diffId) => (state.progress[diffId].stars[CHAPTER_ONE - 1] || 0) > 0;
+/** The endless road opens once the sixth stage has been cleared on that difficulty (or everything is unlocked). */
+export const endlessOpen = (state, diffId) => (state.progress[diffId].stars[CHAPTER_ONE - 1] || 0) > 0 || state.progress[diffId].unlocked >= STAGES;
+
+/**
+ * `?unlock=all` in the address opens every stage and the endless road on both difficulties, for
+ * trying any stage without playing through. Stars and coins already earned are kept. Returns
+ * true if it changed anything (the caller saves).
+ */
+export function applyUnlock(state, search) {
+  let unlock = null;
+  try {
+    unlock = new URLSearchParams(search || '').get('unlock');
+  } catch {
+    return false;
+  }
+  if (unlock !== 'all') return false;
+  let changed = false;
+  for (const p of Object.values(state.progress)) {
+    if (p.unlocked < STAGES) {
+      p.unlocked = STAGES;
+      changed = true;
+    }
+  }
+  return changed;
+}
 
 /** Record an endless run; returns true for a new best distance. */
 export function recordEndless(state, diffId, metres, coins) {

@@ -7,7 +7,7 @@ import { World } from './game.js';
 import { Renderer } from './renderer.js';
 import { Input } from './input.js';
 import { AudioEngine } from './audio.js';
-import { load, save, recordResult, recordEndless, endlessOpen } from './storage.js';
+import { load, save, recordResult, recordEndless, endlessOpen, applyUnlock } from './storage.js';
 import { UNITS_PER_METRE } from './endless.js';
 import { buildBackground, drawBackground } from './backgrounds.js';
 import { createAnim, updateAnim, drawFigure } from './figure.js';
@@ -20,6 +20,8 @@ const renderer = new Renderer(canvas);
 const input = new Input(canvas);
 const audio = new AudioEngine();
 const store = load();
+// ?unlock=all opens every stage, to try any of them without playing through (see README)
+if (applyUnlock(store, typeof location !== 'undefined' ? location.search : '')) save(store);
 audio.muted = store.settings.muted;
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 

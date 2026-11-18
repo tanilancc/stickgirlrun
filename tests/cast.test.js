@@ -63,3 +63,23 @@ test('stages added mid-game keep old saves lined up with the right stages', asyn
   assert.deepEqual(load().progress.adult.stars, s.progress.adult.stars);
   delete globalThis.localStorage;
 });
+
+test('?unlock=all opens every stage and the endless road, and keeps stars', async () => {
+  const mem = new Map();
+  globalThis.localStorage = { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => mem.set(k, String(v)) };
+  const { load, applyUnlock, endlessOpen } = await import('../src/storage.js');
+  const s = load();
+  s.progress.kids.stars[2] = 3;
+  assert.equal(applyUnlock(s, '?lang=en'), false);
+  assert.equal(applyUnlock(s, '?unlock=some'), false);
+  assert.equal(s.progress.kids.unlocked, 1);
+  assert.equal(endlessOpen(s, 'kids'), false);
+  assert.equal(applyUnlock(s, '?unlock=all'), true);
+  for (const d of ['kids', 'adult']) {
+    assert.equal(s.progress[d].unlocked, STAGES.length);
+    assert.equal(endlessOpen(s, d), true);
+  }
+  assert.equal(s.progress.kids.stars[2], 3);
+  assert.equal(applyUnlock(s, '?unlock=all'), false, 'nothing left to change');
+  delete globalThis.localStorage;
+});

@@ -74,3 +74,11 @@ Context: the project grew to eight chapters with only a README and the first des
 Decision: PRD, TSD, SECURITY and DECISIONS in `docs/`, updated in the same commit as the code they
 describe. The original brief stays in `docs/superpowers/specs/` as history.
 Consequences: every future change has to touch the docs too.
+
+## 2026-11-18: Privacy policy and terms as static pages on the site
+Context: the game's audience includes children, so it needs a clear privacy policy and terms.
+Options: a section in the README, a third-party policy generator, or pages written from this game's own data inventory.
+Decision: `privacy.html` and `terms.html`, written from SECURITY.md's data inventory, linked from the
+title screen and deployed with the game; they use system fonts so they load nothing external.
+Consequences: the policy must change in the same commit as any change to what data exists; the
+pages are not a lawyer's work and should be reviewed before wide promotion.

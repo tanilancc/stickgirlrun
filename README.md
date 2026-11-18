@@ -46,7 +46,8 @@ over, clear the site's data in the browser.
 ### Deployment
 
 `.github/workflows/pages.yml` runs `npm test` on every push and pull request. When the tests
-pass on `main`, it publishes only the playable files (`index.html`, `css/`, `src/`) to GitHub
+pass on `main`, it publishes only the playable files (`index.html`, `privacy.html`, `terms.html`,
+`css/`, `src/`) to GitHub
 Pages. All paths are relative, so the game works from the `/stickgirlrun/` sub-path. It needs a
 one-time setting: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
@@ -354,6 +355,7 @@ npm test
 
 ```
 index.html, css/style.css   screens, HUD and styling
+privacy.html, terms.html    privacy policy and terms of use (static, no external loads)
 src/config.js               physics + difficulty constants, jump math
 src/stages.js               chapter one + chapters: palettes, hazards, weather, music
 src/stages-world.js         chapter two, round the world
@@ -406,6 +408,8 @@ tests/                      node:test suites
 - [`docs/SECURITY.md`](docs/SECURITY.md): what data exists (only on the player's device), third
   parties, threats and mitigations, with children as a core audience.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md): the decision log.
+- [`privacy.html`](privacy.html) and [`terms.html`](terms.html): the privacy policy and terms of use,
+  linked from the title screen. The game collects nothing; everything stays on the player's device.
 - [`docs/superpowers/specs/2026-11-08-long-run-home-design.md`](docs/superpowers/specs/2026-11-08-long-run-home-design.md):
   the original design brief, kept as history.
 

@@ -69,6 +69,6 @@ Art is checked by eye: headless Chromium renders a gallery of every prop and eac
 
 ## Deployment
 - `.github/workflows/pages.yml`: on every push and pull request runs `npm test`; on `main` only, and
-  only after tests pass, copies `index.html`, `css/` and `src/` into a Pages artifact and deploys it.
+  only after tests pass, copies `index.html`, `privacy.html`, `terms.html`, `css/` and `src/` into a Pages artifact and deploys it.
 - Live at https://tanilancc.github.io/stickgirlrun/
 - Environment variables: none. Secrets: none (deploys use the workflow's own short-lived token).

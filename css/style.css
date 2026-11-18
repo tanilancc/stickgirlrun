@@ -163,6 +163,8 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 .cta:hover span { transform: translateX(5px); }
 
 .keys { font-size: 14px; letter-spacing: 0.04em; color: var(--faint); margin: 18px 0 0; line-height: 1.8; }
+.legal-links { font-size: 13px; letter-spacing: 0.04em; color: var(--faint); margin: 10px 0 0; }
+.legal-links a { color: inherit; }
 kbd {
   font-family: var(--cond);
   font-weight: 600;

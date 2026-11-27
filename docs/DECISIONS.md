@@ -88,3 +88,8 @@ Context: the launch check found no security headers, and GitHub Pages cannot sen
 Options: move to a host that sets headers, or a CSP `<meta>` tag on each page.
 Decision: a strict CSP `<meta>` on all three pages; the few inline `style` attributes in `main.js` became CSS classes so no `'unsafe-inline'` is needed.
 Consequences: injected scripts and outside connections are blocked; frame protection and HSTS still need a header-capable host. Editing a legal page's `<style>` means updating its hash.
+
+## 2026-11-27: A custom 404 page
+Context: the launch check found no custom error page; wrong addresses showed GitHub's generic 404.
+Decision: a small static `404.html` in the game's colours with a link back to the game, deployed with the site, with its own CSP.
+Consequences: its links are absolute to `/stickgirlrun/`, so they must change if the site moves to a custom domain.

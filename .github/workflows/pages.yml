@@ -48,7 +48,7 @@ jobs:
       - name: Collect the playable files
         run: |
           mkdir -p _site
-          cp -r index.html privacy.html terms.html css src _site/
+          cp -r index.html privacy.html terms.html 404.html css src _site/
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

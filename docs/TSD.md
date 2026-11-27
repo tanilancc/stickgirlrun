@@ -64,12 +64,12 @@ button presses with the player's own physics and picks a safe one.
 - `endless.test.js`: determinism, the leg cycle, flat memory, and the autopilot driving the whole road.
 - `runner.test.js`: jump heights, slide clearance, landing on and bumping into obstacles.
 - `cast.test.js`: the roster, save migration (including stages inserted mid-game), and `?unlock=all`.
-- `csp.test.js`: every page has a CSP, the game uses no inline scripts or styles, and the legal pages' style hashes match.
+- `csp.test.js`: every page has a CSP, the game uses no inline scripts or styles, and the static pages' (privacy, terms, 404) style hashes match.
 
 Art is checked by eye: headless Chromium renders a gallery of every prop and each stage in play.
 
 ## Deployment
 - `.github/workflows/pages.yml`: on every push and pull request runs `npm test`; on `main` only, and
-  only after tests pass, copies `index.html`, `privacy.html`, `terms.html`, `css/` and `src/` into a Pages artifact and deploys it.
+  only after tests pass, copies `index.html`, `privacy.html`, `terms.html`, `404.html`, `css/` and `src/` into a Pages artifact and deploys it.
 - Live at https://tanilancc.github.io/stickgirlrun/
 - Environment variables: none. Secrets: none (deploys use the workflow's own short-lived token).

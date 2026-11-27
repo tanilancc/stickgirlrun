@@ -45,4 +45,4 @@ both difficulties with **zero hits and zero falls** (`npm test`, run on every pu
   Curly, Headband, Tutu, Pinafore, Blue Dress) until the owner says which name goes with which figure,
   and whether real names may go in a public repo at all.
 - Should `?unlock=all` stay in the public build, or move behind a less guessable switch?
-- A lawyer's review of `privacy.html` and `terms.html`, and which country's law the terms should name.
+- A lawyer's review of `privacy.html` and `terms.html` (governing law is settled: Virginia, USA).

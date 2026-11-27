@@ -93,3 +93,8 @@ Consequences: injected scripts and outside connections are blocked; frame protec
 Context: the launch check found no custom error page; wrong addresses showed GitHub's generic 404.
 Decision: a small static `404.html` in the game's colours with a link back to the game, deployed with the site, with its own CSP.
 Consequences: its links are absolute to `/stickgirlrun/`, so they must change if the site moves to a custom domain.
+
+## 2026-11-27: Terms governed by Virginia law; no imprint
+Context: the launch check flagged the missing governing-law clause and missing business details (an EU imprint).
+Decision: the owner is in Virginia, USA, so the terms name Virginia law and keep players' home-country consumer rights. No imprint, since US law has none for a free, non-commercial site and the game collects no personal information.
+Consequences: if the game ever sells anything, collects data, or targets EU players directly, revisit the contact details with a lawyer.

@@ -48,8 +48,11 @@ None. The deploy uses GitHub's built-in, short-lived workflow token. No API keys
 - Refund policy: N/A, nothing is sold (stated in the terms).
 - Both pages load nothing from outside (system fonts, inline styles).
 - **Not legal advice:** these were drafted from the facts of this codebase, not by a lawyer. Have them
-  reviewed before promoting the game to schools or children's platforms, and set a governing-law
-  clause in the terms once the owner's country is decided.
+  reviewed before promoting the game to schools or children's platforms.
+- Governing law: the Commonwealth of Virginia, USA (terms section 9). The owner is in the USA, so no
+  EU-style imprint (named owner and postal address) is required for a free, non-commercial game. COPPA's
+  operator-contact rules apply to sites that collect children's personal information, which this one
+  does not; GitHub issues is the contact route.
 - When the data inventory changes, update `privacy.html` and its effective date in the same commit.
 - License: Apache-2.0 (`LICENSE`).
 

@@ -82,3 +82,9 @@ Decision: `privacy.html` and `terms.html`, written from SECURITY.md's data inven
 title screen and deployed with the game; they use system fonts so they load nothing external.
 Consequences: the policy must change in the same commit as any change to what data exists; the
 pages are not a lawyer's work and should be reviewed before wide promotion.
+
+## 2026-11-27: Content-Security-Policy as a meta tag
+Context: the launch check found no security headers, and GitHub Pages cannot send custom headers.
+Options: move to a host that sets headers, or a CSP `<meta>` tag on each page.
+Decision: a strict CSP `<meta>` on all three pages; the few inline `style` attributes in `main.js` became CSS classes so no `'unsafe-inline'` is needed.
+Consequences: injected scripts and outside connections are blocked; frame protection and HSTS still need a header-capable host. Editing a legal page's `<style>` means updating its hash.

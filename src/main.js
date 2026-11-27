@@ -434,8 +434,8 @@ function showTouchHints(mode) {
   const [n1, n2] = store.settings.team.map((id) => esc(nameOf(id)));
   el.innerHTML =
     mode === 'duo'
-      ? `<div class="zone" style="left:0;top:0;width:50%;height:62%">${n1} · jump</div><div class="zone" style="left:0;top:62%;width:50%;height:38%">${n1} · slide</div><div class="zone" style="left:50%;top:0;width:50%;height:62%">${n2} · jump</div><div class="zone" style="left:50%;top:62%;width:50%;height:38%">${n2} · slide</div>`
-      : `<div class="zone" style="left:0;top:0;width:40%;height:100%">Hold · slide</div><div class="zone" style="left:40%;top:0;width:60%;height:100%">Tap · jump</div>`;
+      ? `<div class="zone z-tl">${n1} · jump</div><div class="zone z-bl">${n1} · slide</div><div class="zone z-tr">${n2} · jump</div><div class="zone z-br">${n2} · slide</div>`
+      : `<div class="zone z-hold">Hold · slide</div><div class="zone z-tap">Tap · jump</div>`;
   el.classList.add('on');
   setTimeout(() => el.classList.remove('on'), 4500);
 }
@@ -525,7 +525,7 @@ function showResults() {
   $('res-sub').textContent = `Next up: ${next.name}, ${next.time.toLowerCase()}.`;
   const third = w.maxHearts === Infinity ? 'stumbles' : 'hearts left';
   const thirdVal = w.maxHearts === Infinity ? s.hits : `${s.hearts}/${w.maxHearts}`;
-  $('res-stats').innerHTML = `<div><dt>Coins</dt><dd>${s.coins}<small style="font-size:.55em;opacity:.6">/${s.coinsTotal}</small></dd></div><div><dt>Time</dt><dd>${fmtTime(s.time)}</dd></div><div><dt>${third}</dt><dd>${thirdVal}</dd></div>`;
+  $('res-stats').innerHTML = `<div><dt>Coins</dt><dd>${s.coins}<small class="unit">/${s.coinsTotal}</small></dd></div><div><dt>Time</dt><dd>${fmtTime(s.time)}</dd></div><div><dt>${third}</dt><dd>${thirdVal}</dd></div>`;
   const [a, b] = w.diff.starCoins;
   $('res-note').textContent =
     s.stars < 3
@@ -575,7 +575,7 @@ function showEndlessResults() {
   $('res-stars').innerHTML = '';
   $('res-title').textContent = isBest ? 'New best.' : 'The road goes on.';
   $('res-sub').textContent = `${fmtNum(s.metres)} m, as far as ${w.stage.name}.`;
-  $('res-stats').innerHTML = `<div><dt>Distance</dt><dd>${fmtNum(s.metres)}<small style="font-size:.55em;opacity:.6"> m</small></dd></div><div><dt>Coins</dt><dd>${s.coins}</dd></div><div><dt>Best</dt><dd>${fmtNum(Math.max(before, s.metres))}<small style="font-size:.55em;opacity:.6"> m</small></dd></div>`;
+  $('res-stats').innerHTML = `<div><dt>Distance</dt><dd>${fmtNum(s.metres)}<small class="unit"> m</small></dd></div><div><dt>Coins</dt><dd>${s.coins}</dd></div><div><dt>Best</dt><dd>${fmtNum(Math.max(before, s.metres))}<small class="unit"> m</small></dd></div>`;
   $('res-note').textContent = isBest
     ? before
       ? `${fmtNum(s.metres - before)} m further than ever. A flag on the road marks it now.`
@@ -648,7 +648,7 @@ function showEnding(s, chapter = 0) {
   $('end-title').textContent = e.title;
   $('end-text').textContent = e.text(subject);
   $('end-note').textContent = e.note;
-  $('end-stats').innerHTML = `<div><dt>Stars</dt><dd>${total}/${STAGES.length * 3}</dd></div><div><dt>Coins this run</dt><dd>${s.coins}</dd></div><div><dt>Played on</dt><dd style="font-size:20px">${DIFFICULTY[diff].label}</dd></div>`;
+  $('end-stats').innerHTML = `<div><dt>Stars</dt><dd>${total}/${STAGES.length * 3}</dd></div><div><dt>Coins this run</dt><dd>${s.coins}</dd></div><div><dt>Played on</dt><dd class="dd-word">${DIFFICULTY[diff].label}</dd></div>`;
   const next = CHAPTERS[chapter + 1];
   const nextBtn = $('btn-end-next');
   nextBtn.hidden = !next;

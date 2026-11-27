@@ -57,13 +57,14 @@ N/A: the "autopilot" (`bot.js`) is a deterministic search, not an LLM. It simula
 button presses with the player's own physics and picks a safe one.
 
 ## Testing
-`npm test` runs `node --test tests/*.test.js`, currently 126 tests:
+`npm test` runs `node --test tests/*.test.js`, currently 129 tests:
 - `autopilot.test.js`: every stage on both difficulties, finished with zero hits and zero falls.
 - `level.test.js`: determinism, every gap within jump reach, kids levels gentler (under 0.85 of the
   adult hazard rate), every stage names only props, terrains and chapters that exist.
 - `endless.test.js`: determinism, the leg cycle, flat memory, and the autopilot driving the whole road.
 - `runner.test.js`: jump heights, slide clearance, landing on and bumping into obstacles.
 - `cast.test.js`: the roster, save migration (including stages inserted mid-game), and `?unlock=all`.
+- `csp.test.js`: every page has a CSP, the game uses no inline scripts or styles, and the legal pages' style hashes match.
 
 Art is checked by eye: headless Chromium renders a gallery of every prop and each stage in play.
 

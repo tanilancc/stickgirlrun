@@ -666,3 +666,13 @@ kbd {
   .screen.active, .stars-big svg.on, .coins.bump, .hearts.hit { animation: none; }
   #caption { transition: opacity 0.3s; transform: none; }
 }
+
+/* Touch-hint zones and stat units as classes, so the Content-Security-Policy needs no inline styles. */
+#touch-hints .z-tl { left: 0; top: 0; width: 50%; height: 62%; }
+#touch-hints .z-bl { left: 0; top: 62%; width: 50%; height: 38%; }
+#touch-hints .z-tr { left: 50%; top: 0; width: 50%; height: 62%; }
+#touch-hints .z-br { left: 50%; top: 62%; width: 50%; height: 38%; }
+#touch-hints .z-hold { left: 0; top: 0; width: 40%; height: 100%; }
+#touch-hints .z-tap { left: 40%; top: 0; width: 60%; height: 100%; }
+small.unit { font-size: 0.55em; opacity: 0.6; }
+dd.dd-word { font-size: 20px; }

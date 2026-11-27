@@ -29,6 +29,8 @@ To remove Google entirely, self-host the three font families in `css/` (see Open
 | A tampered or corrupt save breaks the game | `load()` validates every field, falls back to defaults on bad JSON, and drops unknown runners |
 | Inserting stages shifts saved stars onto the wrong stages | saves record their stage order; older saves are mapped by id (tested) |
 | `?unlock=all` lets anyone skip ahead | accepted: it is a single-player game with no rankings or prizes, and it changes only that browser's own save |
+| Injected script or outside connection (if a bug ever let one through) | a Content-Security-Policy `<meta>` on every page: the game allows only its own scripts and styles plus Google Fonts, no inline scripts or styles, no network connections (`connect-src 'none'`), no frames or plugins; the legal pages allow only their own inline stylesheet, by hash |
+| Clickjacking, HSTS, `X-Content-Type-Options` | not settable: GitHub Pages sends no custom headers and browsers ignore `frame-ancestors` in a `<meta>`. HTTPS is enforced on `github.io`. A header-capable host (Cloudflare, Netlify) would close this |
 | Supply-chain attack through dependencies | there are no runtime or dev dependencies; tests use Node's built-in runner |
 | Compromised deploy | Pages deploys only from `main`, only after tests pass, with job-scoped permissions (`pages: write`, `id-token: write`, `contents: read`) |
 | Children's privacy (COPPA / GDPR-K) | no collection, no accounts, no tracking, no chat, no ads; the only off-device data is the hosting and font requests listed above |
@@ -53,3 +55,8 @@ None. The deploy uses GitHub's built-in, short-lived workflow token. No API keys
 ## Open item
 Self-hosting the fonts would leave GitHub Pages as the only third party, which makes the privacy
 policy simpler for a children's game.
+
+## Content-Security-Policy upkeep
+- Never add inline `<script>` or `style="..."` attributes in `index.html` or in HTML built by `src/`; use classes in `css/style.css` (setting `el.style.x` from JS is fine).
+- Editing the `<style>` block in `privacy.html` or `terms.html` changes its hash: recompute the `sha256-` value in that page's CSP, or the page loses its styling.
+- If the fonts are self-hosted, drop `https://fonts.googleapis.com` and `https://fonts.gstatic.com` from the game's CSP.

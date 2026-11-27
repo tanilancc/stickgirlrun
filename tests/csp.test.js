@@ -30,3 +30,18 @@ test("each static page's CSP hash matches its <style> block", () => {
     assert.ok(cspOf(html).includes(`'sha256-${hash}'`), `${f}: recompute the style hash in its CSP`);
   }
 });
+
+test('the game loads nothing from other sites, and every self-hosted font file exists', () => {
+  const html = read('index.html');
+  const loads = [...html.matchAll(/<(?:link|script)\b[^>]*\b(?:href|src)="([^"]+)"/g)].map((m) => m[1]);
+  for (const u of loads) assert.ok(!/^(https?:)?\/\//.test(u), `index.html loads ${u} from another site`);
+  assert.ok(!/https?:/.test(cspOf(html)), 'the game CSP should allow no outside hosts');
+  const css = read('css/fonts.css');
+  const files = [...css.matchAll(/url\(([^)]+)\)/g)].map((m) => m[1]);
+  assert.ok(files.length > 0);
+  for (const f of files) {
+    assert.ok(!/^(https?:)?\/\//.test(f), `fonts.css loads ${f} from another site`);
+    assert.ok(readFileSync(new URL('../css/' + f, import.meta.url)).length > 1000, `missing font ${f}`);
+  }
+  assert.match(read('css/fonts/OFL.txt'), /SIL OPEN FONT LICENSE Version 1\.1/);
+});

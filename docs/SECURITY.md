@@ -43,7 +43,7 @@ None. The deploy uses GitHub's built-in, short-lived workflow token. No API keys
 ## Legal pages
 - Privacy policy: [`privacy.html`](../privacy.html), linked from the title screen. Written from the
   data inventory above: nothing collected, what localStorage holds and how to delete it, GitHub Pages
-  named as the only third party, children (COPPA, GDPR) covered, contact via GitHub issues.
+  named as the only third party, children (COPPA, GDPR) covered, contact by email at info@tanilancc.com or via GitHub issues.
 - Terms of use: [`terms.html`](../terms.html), linked from the title screen: free, parental
   supervision, a flashing-lights warning, fair use, Apache-2.0 code, no warranty, contact.
 - Refund policy: N/A, nothing is sold (stated in the terms).
@@ -53,7 +53,8 @@ None. The deploy uses GitHub's built-in, short-lived workflow token. No API keys
 - Governing law: the Commonwealth of Virginia, USA (terms section 9). The owner is in the USA, so no
   EU-style imprint (named owner and postal address) is required for a free, non-commercial game. COPPA's
   operator-contact rules apply to sites that collect children's personal information, which this one
-  does not; GitHub issues is the contact route.
+  does not. Contact is by email at info@tanilancc.com (the owner's business address), with GitHub
+  issues as a public alternative.
 - When the data inventory changes, update `privacy.html` and its effective date in the same commit.
 - License: Apache-2.0 (`LICENSE`).
 

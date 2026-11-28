@@ -104,3 +104,8 @@ Context: the launch check flagged that Google Fonts received every visitor's IP 
 Options: keep Google Fonts and disclose it, switch to system fonts, or self-host the same fonts.
 Decision: self-host the same three families (WOFF2, Latin and Latin Extended subsets, about 0.5 MB) with their OFL license, and tighten the CSP to `font-src 'self'`.
 Consequences: GitHub Pages is the only third party and the privacy policy says so; the look is unchanged. Characters outside Latin and Latin Extended (for example Cyrillic names) fall back to system fonts.
+
+## 2026-11-28: A contact email on the legal pages
+Context: parents with a privacy question rarely have a GitHub account, and the policy gave issues as the only route.
+Decision: `privacy.html` and `terms.html` give the owner's business address, info@tanilancc.com, first, with GitHub issues as a public alternative. The owner's personal address is never used on the site.
+Consequences: the inbox needs watching; a change of address means updating both pages and their effective dates.
